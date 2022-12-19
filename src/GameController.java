@@ -4,16 +4,16 @@ import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import javax.swing.*;
-public class GameController implements MouseListener, ActionListener, Runnable {
+public class GameController implements MouseListener, Runnable {
     //    private MapView mapView;
     private Setting setting;
-    private GameView gameView;
+    private GameView gameView ,testview;
     private MainMapView mapView;
     private boolean isOpeningSetting = false;
     private int randomNum;
     private Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
     private int width = 1280, height = 720;
-    //    private int width = (int) dimension.getWidth(), height = (int) dimension.getHeight();
+//        private int width = (int) dimension.getWidth(), height = (int) dimension.getHeight();
     private int mapPositionWidth[] = {height / 8 * 7 - height / 24, height / 8 * 6 - height / 12, height / 8 * 5 - height / 12, height / 8 * 4 - height / 12, height / 8 * 3 - height / 12, height / 8 * 1 - height / 24,
             height / 8 * 1 - height / 24, height / 8 * 1 - height / 24, height / 8 * 1 - height / 24, height / 8 * 1 - height / 24, height / 8 * 1 - height / 24, height / 8 * 3 - height / 12, height / 8 * 4 - height / 12,
             height / 8 * 5 - height / 12, height / 8 * 6 - height / 12, height / 8 * 7 - height / 24, height / 8 * 7 - height / 24, height / 8 * 7 - height / 24, height / 8 * 7 - height / 24, height / 8 * 7 - height / 24};
@@ -30,7 +30,6 @@ public class GameController implements MouseListener, ActionListener, Runnable {
     static int CountThread = 0;
 
     //หน้าจอ
-    private MainView mainview;
     private EventView pokemonFightview, test;
 
 
@@ -56,6 +55,7 @@ public class GameController implements MouseListener, ActionListener, Runnable {
     private Player playerA;
     private Player playerB;
     private int FirstPerson = 0;
+    private int CountRun = 0;
 
     private Pokemon enemyPokemon;
 
@@ -65,11 +65,7 @@ public class GameController implements MouseListener, ActionListener, Runnable {
     // Test ระบบเกม
     int HP = 100;
     private ArrayList<EventView> eventView = new ArrayList<EventView>();
-    private EventView testpokemonFightview = new EventView(-1,
-            false,
-            true,
-            false,
-            playerA);
+
 
     //<-------------------------------------------------------------------------------------------------------------------------------------------------------------->
 
@@ -138,10 +134,26 @@ public class GameController implements MouseListener, ActionListener, Runnable {
         } else if (e.getSource().equals(gameView.getMenuView().getExitPanel())) {
             System.exit(0);
         } else if (e.getSource().equals(gameView.getMapView().getSettingPanel())) {
-            setting = new Setting(gameView.getMapView().getWidth(), gameView.getMapView().getHeight(), gameView);
-            setting.getOk().addActionListener(this);
-            setting.getExit().addActionListener(this);
-        } else if (e.getSource().equals(gameView.getMapView().getRollPanel())) {
+            currentPosition1 = 0;
+            currentPosition2 = 0;
+            gameView.dispose();
+            gameView = new GameView(width, height);
+            gameView.getMenuView().getStartPanel().addMouseListener(this);
+            gameView.getMenuView().getTutorialPanel().addMouseListener(this);
+            gameView.getMenuView().getSettingPanel().addMouseListener(this);
+            gameView.getMenuView().getExitPanel().addMouseListener(this);
+        }
+        else if(e.getSource().equals(gameView.getMenuView().getSettingPanel()) && isSetting == false) {
+            setting = new Setting(width, height, gameView);
+            isSetting = true;
+            setting.getFalseNotFullScreenPanel().addMouseListener(this);
+            setting.getTrueNotFullScreenPanel().addMouseListener(this);
+            setting.getFalseFullScreenPanel().addMouseListener(this);
+            setting.getTrueFullScreenPanel().addMouseListener(this);
+            setting.getSavePanel().addMouseListener(this);
+            setting.getBackPanel().addMouseListener(this);
+        }
+        else if (e.getSource().equals(gameView.getMapView().getRollPanel())) {
             randomNum = ThreadLocalRandom.current().nextInt(1, 6 + 1);
             this.random = randomNum;
 //            currentPosition += randomNum;
@@ -160,6 +172,7 @@ public class GameController implements MouseListener, ActionListener, Runnable {
                         }, 10
                 );
                 isPlayer1 = !isPlayer1;
+                CountRun++;
             } else {
                 gameView.getPlayer2().setBounds(mapPositionWidth[currentPosition2] + height / 48, mapPositionHeight[currentPosition2] - height / 24, height / 24 * 3 / 2, height / 12 * 3 / 2);
                 new java.util.Timer().schedule(
@@ -171,9 +184,72 @@ public class GameController implements MouseListener, ActionListener, Runnable {
                         }, 250
                 );
                 System.out.println(playerB.getName());
-                isPlayer1 = !isPlayer1;
+                CountRun++;
+                isPlayer1 =!isPlayer1;
             }
             CountRoll += 1;
+        }
+        else if(e.getSource().equals(setting.getFalseFullScreenPanel())){
+            setting.getSetting().remove(setting.getFalseFullScreenPanel());
+            setting.getSetting().remove(setting.getTrueNotFullScreenPanel());
+            setting.getSetting().remove(setting.getSpace1());
+            setting.getSetting().remove(setting.getSpace2());
+            setting.getSetting().remove(setting.getSavePanel());
+            setting.getSetting().remove(setting.getBackPanel());
+            setting.getSetting().add(setting.getFalseNotFullScreenPanel());
+            setting.getSetting().add(setting.getSpace1());
+            setting.getSetting().add(setting.getTrueFullScreenPanel());
+            setting.getSetting().add(setting.getSpace2());
+            setting.getSetting().add(setting.getSavePanel());
+            setting.getSetting().add(setting.getBackPanel());
+            this.width = (int) dimension.getWidth();height = (int) dimension.getHeight();
+            mapPositionWidth = new int[]{height/8*7-height/24, height/8*6-height/12,height/8*5-height/12,height/8*4-height/12,height/8*3-height/12,height/8*1-height/24,
+                    height/8*1-height/24,height/8*1-height/24,height/8*1-height/24,height/8*1-height/24,height/8*1-height/24,height/8*3-height/12,height/8*4-height/12,
+                    height/8*5-height/12,height/8*6-height/12,height/8*7-height/24,height/8*7-height/24,height/8*7-height/24,height/8*7-height/24,height/8*7-height/24};
+            mapPositionHeight = new int[]{height/8*7-height/24,height/8*7-height/24,height/8*7-height/24,height/8*7-height/24,height/8*7-height/24,height/8*7-height/24,
+                    height/8*6-height/12*3/2, height/8*5-height/12*3/2, height/8*4-height/12*3/2,height/8*3-height/12*3/2,height/8*1-height/24,height/8*1-height/24,height/8*1-height/24,
+                    height/8*1-height/24,height/8*1-height/24,height/8*1-height/24,height/8*3-height/12*3/2,height/8*4-height/12*3/2,height/8*5-height/12*3/2,height/8*6-height/12*3/2};
+
+            setting.getWindow().revalidate();
+            setting.getWindow().repaint();
+        }
+        else if(e.getSource().equals(setting.getFalseNotFullScreenPanel())){
+            setting.getSetting().remove(setting.getTrueFullScreenPanel());
+            setting.getSetting().remove(setting.getFalseNotFullScreenPanel());
+            setting.getSetting().remove(setting.getSpace1());
+            setting.getSetting().remove(setting.getSpace2());
+            setting.getSetting().remove(setting.getSavePanel());
+            setting.getSetting().remove(setting.getBackPanel());
+            setting.getSetting().add(setting.getTrueNotFullScreenPanel());
+            setting.getSetting().add(setting.getSpace1());
+            setting.getSetting().add(setting.getFalseFullScreenPanel());
+            setting.getSetting().add(setting.getSpace2());
+            setting.getSetting().add(setting.getSavePanel());
+            setting.getSetting().add(setting.getBackPanel());
+            this.width = 1280;height = 720;
+            mapPositionWidth = new int[]{height/8*7-height/24, height/8*6-height/12,height/8*5-height/12,height/8*4-height/12,height/8*3-height/12,height/8*1-height/24,
+                    height/8*1-height/24,height/8*1-height/24,height/8*1-height/24,height/8*1-height/24,height/8*1-height/24,height/8*3-height/12,height/8*4-height/12,
+                    height/8*5-height/12,height/8*6-height/12,height/8*7-height/24,height/8*7-height/24,height/8*7-height/24,height/8*7-height/24,height/8*7-height/24};
+            mapPositionHeight = new int[]{height/8*7-height/24,height/8*7-height/24,height/8*7-height/24,height/8*7-height/24,height/8*7-height/24,height/8*7-height/24,
+                    height/8*6-height/12*3/2, height/8*5-height/12*3/2, height/8*4-height/12*3/2,height/8*3-height/12*3/2,height/8*1-height/24,height/8*1-height/24,height/8*1-height/24,
+                    height/8*1-height/24,height/8*1-height/24,height/8*1-height/24,height/8*3-height/12*3/2,height/8*4-height/12*3/2,height/8*5-height/12*3/2,height/8*6-height/12*3/2};
+
+            setting.getWindow().revalidate();
+            setting.getWindow().repaint();
+        }
+        else if(e.getSource().equals(setting.getSavePanel())){
+            setting.getWindow().dispose();
+            gameView.dispose();
+            gameView = new GameView(width, height);
+            gameView.getMenuView().getStartPanel().addMouseListener(this);
+            gameView.getMenuView().getTutorialPanel().addMouseListener(this);
+            gameView.getMenuView().getSettingPanel().addMouseListener(this);
+            gameView.getMenuView().getExitPanel().addMouseListener(this);
+            isSetting = false;
+        }
+        else if(e.getSource().equals(setting.getBackPanel())){
+            setting.getWindow().dispose();
+            isSetting = false;
         }
 
     }
@@ -211,24 +287,11 @@ public class GameController implements MouseListener, ActionListener, Runnable {
     }
 
     ///Main xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    public static void main(String[] args) {
-        new ControlGame();
-    }
+
 
     // ActionListener ------------------------------------------------------------------------------------------------
 
 
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource().equals(mainview.getBtnRoll())) {
-
-        }
-        if (e.getSource().equals(setting.getOk())) {
-            setting.getWindow().dispose();
-            isOpeningSetting = false;
-        } else if (e.getSource().equals(setting.getExit())) {
-            System.exit(0);
-        }
-    }
 
     //MovePlayer++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //    public void ramdomAndmove(Player p, boolean c){
@@ -310,7 +373,8 @@ public class GameController implements MouseListener, ActionListener, Runnable {
 
     // เปลี่ยนหน้าตัวละคร -----------------------------------------------------------------------------------------------
     public void ChangeEvent(Player p, boolean catching) {
-        System.out.println("Check kuay"+FirstPerson);
+        System.out.println("isPlaye r"+isPlayer1);
+        System.out.println("First"+ FirstPerson);
         if (catching == false) {
             //<----------------------------------------------Rolling----------------------------------->
             //dddd
@@ -333,41 +397,36 @@ public class GameController implements MouseListener, ActionListener, Runnable {
             System.out.println("After Rolling :" + p.getCurrentPoint());
             //<----------------------------------------------Rolling----------------------------------->
             //ตาแรกนะครับ
-            if (isPlayer1 == false && FirstPerson == 0) {
-                FirstPerson+=1;
-                System.out.println("<<<<<<<<<<<<<<FistTime>>>>>>>>>>>>>");
-                // wait ตามจำนวนเวลาที่ถอยลูกเต๋า
-                try {
-                    Thread.sleep(350);
-                } catch (Exception i) {
-                    i.printStackTrace();
-                }
-                pokemonFightview = new EventView(p.getCurrentPoint(),
-                        false,
-                        false,
-                        false,
-                        p);
-                System.out.println("Change!!!");
-                gameView.getMapView().getMapPanel().remove(gameView.getMapView().getEventView());
-                gameView.getMapView().getMapPanel().add(pokemonFightview, BorderLayout.CENTER);
-                gameView.getMapView().getMapPanel().revalidate();
-                gameView.getMapView().getMapPanel().repaint();
-                gameView.getPlayer1().setBounds(mapPositionWidth[currentPosition1] - height / 48, mapPositionHeight[currentPosition1] - height / 48, height / 24 * 3 / 2, height / 12 * 3 / 2);
-                gameView.getPlayer2().setBounds(mapPositionWidth[currentPosition2] + height / 48, mapPositionHeight[currentPosition2] - height / 24, height / 24 * 3 / 2, height / 12 * 3 / 2);
-                gameView.getPlayer1().repaint();
-                // สั้งให้ต่อสู้
-                System.out.println("Enemy pokemon =" + pokemonFightview.getEnemyPokemon().getName());
-                System.out.println("Attack!");
-                if (gameView.getMapView().getMapPanel().isDisplayable()) {
-                    move(gameView,  pokemonFightview, p);
-                }
+            if (isPlayer1 == false) {
+//                FirstPerson+=1;
+//                System.out.println("<<<<<<<<<<<<<<FistTime>>>>>>>>>>>>>");
+//                // wait ตามจำนวนเวลาที่ถอยลูกเต๋า
+//                try {
+//                    Thread.sleep(350);
+//                } catch (Exception i) {
+//                    i.printStackTrace();
+//                }
+//                pokemonFightview = new EventView(5,
+//                        false,
+//                        false,
+//                        false,
+//                        p,
+//                        false);
+//                System.out.println("Change!!!");
+//                gameView.getMapView().getMapPanel().remove(gameView.getMapView().getEventView());
+//                gameView.getMapView().getMapPanel().add(pokemonFightview, BorderLayout.CENTER);
+//                gameView.getMapView().getMapPanel().revalidate();
+//                gameView.getMapView().getMapPanel().repaint();
+//                gameView.getPlayer1().setBounds(mapPositionWidth[currentPosition1] - height / 48, mapPositionHeight[currentPosition1] - height / 48, height / 24 * 3 / 2, height / 12 * 3 / 2);
+//                gameView.getPlayer2().setBounds(mapPositionWidth[currentPosition2] + height / 48, mapPositionHeight[currentPosition2] - height / 24, height / 24 * 3 / 2, height / 12 * 3 / 2);
+//                gameView.getPlayer1().repaint();
+//                // สั้งให้ต่อสู้
+//                System.out.println("Enemy pokemon =" + pokemonFightview.getEnemyPokemon().getName());
+//                if (gameView.getMapView().getMapPanel().isDisplayable() && FirstPerson !=0 && (p.getCurrentPoint()!= 5 ||p.getCurrentPoint()!= 10 ||p.getCurrentPoint()!= 15))
+//                {
+//                    move(gameView,  pokemonFightview, p);
+//                }
                 // ขยับ CheckRound
-
-            }
-            // ถ้าCatching ไม่เท่ากับ true หมายความว่า animation ที่กำลังจะสรา้งจะเป็น อนิเมชั่นต่อสู้ทันที่
-            if (FirstPerson!=0) {
-                //<-------------------------Two----------------------------------------------------------->
-                // หยุดการทำงานของ Thread และ ลบ Thread ตัวนั้นออกจาก List
                 BorderLayout layout = (BorderLayout) gameView.getMapView().getMapPanel().getLayout();
                 gameView.getMapView().getMapPanel().remove(layout.getLayoutComponent(BorderLayout.CENTER));
                 gameView.getMapView().getMapPanel().revalidate();
@@ -375,7 +434,7 @@ public class GameController implements MouseListener, ActionListener, Runnable {
                 gameView.getPlayer1().setBounds(mapPositionWidth[currentPosition1] - height / 48, mapPositionHeight[currentPosition1] - height / 48, height / 24 * 3 / 2, height / 12 * 3 / 2);
                 gameView.getPlayer2().setBounds(mapPositionWidth[currentPosition2] + height / 48, mapPositionHeight[currentPosition2] - height / 24, height / 24 * 3 / 2, height / 12 * 3 / 2);
                 gameView.getPlayer1().repaint();
-                pokemonFightview = new EventView(-2, false, false, true, p);
+                pokemonFightview = new EventView(-2, false, false, true, p, false, width, height);
                 gameView.getMapView().getMapPanel().add(pokemonFightview, BorderLayout.CENTER);
                 gameView.getMapView().getMapPanel().revalidate();
                 gameView.getMapView().getMapPanel().repaint();
@@ -394,7 +453,10 @@ public class GameController implements MouseListener, ActionListener, Runnable {
                             false,
                             false,
                             false,
-                            p);
+                            p,
+                            false,
+                            width,
+                            height);
                     gameView.getMapView().getMapPanel().remove(layout.getLayoutComponent(BorderLayout.CENTER));
                     gameView.getMapView().getMapPanel().revalidate();
                     gameView.getMapView().getMapPanel().repaint();
@@ -407,10 +469,65 @@ public class GameController implements MouseListener, ActionListener, Runnable {
                     gameView.getPlayer1().setBounds(mapPositionWidth[currentPosition1] - height / 48, mapPositionHeight[currentPosition1] - height / 48, height / 24 * 3 / 2, height / 12 * 3 / 2);
                     gameView.getPlayer2().setBounds(mapPositionWidth[currentPosition2] + height / 48, mapPositionHeight[currentPosition2] - height / 24, height / 24 * 3 / 2, height / 12 * 3 / 2);
                     gameView.getPlayer1().repaint();
-                    saveThread.get(0).interrupt();
-                    saveThread.remove(0);
-                    System.out.println("Attack!");
-                    if (gameView.getMapView().getMapPanel().isDisplayable() && FirstPerson !=0) {
+                    if (gameView.getMapView().getMapPanel().isDisplayable() && (p.getCurrentPoint()!= 5 ||p.getCurrentPoint()!= 10 ||p.getCurrentPoint()!= 15))
+                        System.out.println("Attack!");
+                    {
+                        move(gameView,  pokemonFightview, p);
+                    }
+                } catch (Exception i) {
+                    i.printStackTrace();
+                }
+
+            }
+            // ถ้าCatching ไม่เท่ากับ true หมายความว่า animation ที่กำลังจะสรา้งจะเป็น อนิเมชั่นต่อสู้ทันที่
+            if (isPlayer1== true) {
+                //<-------------------------Two----------------------------------------------------------->
+                // หยุดการทำงานของ Thread และ ลบ Thread ตัวนั้นออกจาก List
+                BorderLayout layout = (BorderLayout) gameView.getMapView().getMapPanel().getLayout();
+                gameView.getMapView().getMapPanel().remove(layout.getLayoutComponent(BorderLayout.CENTER));
+                gameView.getMapView().getMapPanel().revalidate();
+                gameView.getMapView().getMapPanel().repaint();
+                gameView.getPlayer1().setBounds(mapPositionWidth[currentPosition1] - height / 48, mapPositionHeight[currentPosition1] - height / 48, height / 24 * 3 / 2, height / 12 * 3 / 2);
+                gameView.getPlayer2().setBounds(mapPositionWidth[currentPosition2] + height / 48, mapPositionHeight[currentPosition2] - height / 24, height / 24 * 3 / 2, height / 12 * 3 / 2);
+                gameView.getPlayer1().repaint();
+                pokemonFightview = new EventView(-2, false, false, true, p, false,width,height);
+                gameView.getMapView().getMapPanel().add(pokemonFightview, BorderLayout.CENTER);
+                gameView.getMapView().getMapPanel().revalidate();
+                gameView.getMapView().getMapPanel().repaint();
+                gameView.getPlayer1().setBounds(mapPositionWidth[currentPosition1] - height / 48, mapPositionHeight[currentPosition1] - height / 48, height / 24 * 3 / 2, height / 12 * 3 / 2);
+                gameView.getPlayer2().setBounds(mapPositionWidth[currentPosition2] + height / 48, mapPositionHeight[currentPosition2] - height / 24, height / 24 * 3 / 2, height / 12 * 3 / 2);
+                gameView.getPlayer1().repaint();
+                try {
+                    Thread.sleep(5000);
+                } catch (Exception i) {
+                    i.printStackTrace();
+                }
+                try {
+                    System.out.println("=============================Two========================");
+                    System.out.println("this is Current" + p.getCurrentPoint());
+                    pokemonFightview = new EventView(p.getCurrentPoint(),
+                            false,
+                            false,
+                            false,
+                            p,
+                            false,
+                            width,
+                            height);
+                    gameView.getMapView().getMapPanel().remove(layout.getLayoutComponent(BorderLayout.CENTER));
+                    gameView.getMapView().getMapPanel().revalidate();
+                    gameView.getMapView().getMapPanel().repaint();
+                    gameView.getPlayer1().setBounds(mapPositionWidth[currentPosition1] - height / 48, mapPositionHeight[currentPosition1] - height / 48, height / 24 * 3 / 2, height / 12 * 3 / 2);
+                    gameView.getPlayer2().setBounds(mapPositionWidth[currentPosition2] + height / 48, mapPositionHeight[currentPosition2] - height / 24, height / 24 * 3 / 2, height / 12 * 3 / 2);
+                    gameView.getPlayer1().repaint();
+                    gameView.getMapView().getMapPanel().add(pokemonFightview, BorderLayout.CENTER);
+                    gameView.getMapView().getMapPanel().revalidate();
+                    gameView.getMapView().getMapPanel().repaint();
+                    gameView.getPlayer1().setBounds(mapPositionWidth[currentPosition1] - height / 48, mapPositionHeight[currentPosition1] - height / 48, height / 24 * 3 / 2, height / 12 * 3 / 2);
+                    gameView.getPlayer2().setBounds(mapPositionWidth[currentPosition2] + height / 48, mapPositionHeight[currentPosition2] - height / 24, height / 24 * 3 / 2, height / 12 * 3 / 2);
+                    gameView.getPlayer1().repaint();
+                    if (gameView.getMapView().getMapPanel().isDisplayable()  && (p.getCurrentPoint()!= 5 ||p.getCurrentPoint()!= 10 ||p.getCurrentPoint()!= 15))
+                        System.out.println("Attack!");
+                    {
                         move(gameView,  pokemonFightview, p);
                     }
                 } catch (Exception i) {
@@ -427,7 +544,10 @@ public class GameController implements MouseListener, ActionListener, Runnable {
                     false,
                     true,
                     false,
-                    p);
+                    p,
+                    false,
+                     width,
+                    height);
             gameView.getMapView().getMapPanel().add(pokemonFightview, BorderLayout.CENTER);
             gameView.getMapView().getMapPanel().revalidate();
             gameView.getMapView().getMapPanel().repaint();
@@ -440,8 +560,9 @@ public class GameController implements MouseListener, ActionListener, Runnable {
     // Move โปนเกม่อน>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     public void move(JFrame gameView, EventView eventView, Player player) {
         try {
+            warring = 0;
             // อยากจะให้เริ่มเดินเมื่อไหร่ ปรับตรงนี้ ถ้าตอนการให้เดินเลย ปรับให้เท่ากับข้างบน
-            Thread.sleep(5000);
+            Thread.sleep(50);
             if (stopfight) {
                 while (true) {
                     if (eventView.first) {
@@ -552,70 +673,113 @@ public class GameController implements MouseListener, ActionListener, Runnable {
 
     // ทำหน้าจับหรือปล่อย โปรเกม่อน
     public void EnemyAttack(Pokemon enemypokemon, Pokemon playerpokemon) {
-
-        if (enemypokemon.getHP()<5 && warring==0) {
-            warring +=1;
-            // ไม่เข้าใจแม่งเหมือนกัน แค่รู้ว่าใช้แล้ว Thread ตัวนั้นหยุดทำงาน
-            synchronized (saveThread.get(0)) {
-                try {
-                    Thread.sleep(10);
-                    GetJoptionPlane();
-                    System.out.println("Joptionpaint");
-                    if (input == MyJOptionPane.YES_OPTION) {
-                        saveThread.get(0).wait();
-                        go(playerA, true);
-                        System.out.println("fight");
-                    }
-
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
+        enemypokemon.attack(playerpokemon);
 
     }
     public void PlayerAttack(Pokemon playerpokenon, Pokemon enmemypokemon) {
         playerpokenon.attack(enmemypokemon);
         if (enmemypokemon.getHP() < 30 && warring == 0) {
-            warring +=1;
+            warring += 1;
             // ไม่เข้าใจแม่งเหมือนกัน แค่รู้ว่าใช้แล้ว Thread ตัวนั้นหยุดทำงาน
-            String[] options = new String[] {"Catch", "Fight"};
+            String[] options = new String[]{"Catch", "Fight"};
             int response = JOptionPane.showOptionDialog(null, "Enemy Pokemon LOW!", "Catch Or Fight",
                     JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,
                     null, options, options[0]);
-            synchronized (saveThread.get(0)){
-                if(response ==0){
-                    System.out.println("Cathing");
-                    try {
-                        System.out.println("stop");
-                        saveThread.get(0).interrupt();
-                        saveThread.remove(0);
-                    }catch (Exception i){
-
-                    }
-                    BorderLayout layout = (BorderLayout)gameView.getMapView().getMapPanel().getLayout();
+            if(response == 0) {
+                if (isPlayer1 == false) {
+                    playerA.getPokemons().add(enmemypokemon);
+                    System.out.println("Now A have pokemon "+playerB.getPokemons().size());
+                    BorderLayout layout = (BorderLayout) gameView.getMapView().getMapPanel().getLayout();
                     gameView.getMapView().getMapPanel().remove(layout.getLayoutComponent(BorderLayout.CENTER));
-                    if(isPlayer1 == false){
-                        go(playerA, true);
-                    }else{
-                        go(playerB, true);
-                    }
-                }
-            }
+                    pokemonFightview = new EventView(-1,
+                            false,
+                            true,
+                            false,
+                            playerA,
+                            false,
+                            width,
+                            height);
+                    gameView.getMapView().getMapPanel().add(pokemonFightview, BorderLayout.CENTER);
+                    gameView.getMapView().getMapPanel().revalidate();
+                    gameView.getMapView().getMapPanel().repaint();
+                } else {
+                    playerB.getPokemons().add(enmemypokemon);
+                    System.out.println("Now b have pokemon "+playerB.getPokemons().size());
+                    BorderLayout layout = (BorderLayout) gameView.getMapView().getMapPanel().getLayout();
+                    gameView.getMapView().getMapPanel().remove(layout.getLayoutComponent(BorderLayout.CENTER));
+                    pokemonFightview = new EventView(-1,
+                            false,
+                            true,
+                            false,
+                            playerB,
+                            false,
+                            width,
+                            height);
+                    gameView.getMapView().getMapPanel().add(pokemonFightview, BorderLayout.CENTER);
+                    gameView.getMapView().getMapPanel().revalidate();
+                    gameView.getMapView().getMapPanel().repaint();
 
-        }
-        else if(enemyPokemon.getHP() < 0){
-            synchronized (saveThread.get(0)){
+                }
                 try {
                     saveThread.get(0).interrupt();
                     saveThread.remove(0);
-                }catch(Exception i){
-
+                } catch (Exception i) {
+                    i.printStackTrace();
                 }
             }
-        }
 
+        }
+        if(enmemypokemon.getHP() < 0 ){
+            System.out.println("DIED");
+            BorderLayout layout = (BorderLayout) gameView.getMapView().getMapPanel().getLayout();
+            gameView.getMapView().getMapPanel().remove(layout.getLayoutComponent(BorderLayout.CENTER));
+            if(isPlayer1 == false){
+                //เพิ่ม HP Pokemon ของ Player A
+
+                // สร้างหน้าที่บอกว่าโปเกม่อนตาย
+                pokemonFightview = new EventView(-3,
+                        false,
+                        true,
+                        false,
+                        playerA,
+                        true,
+                        width,
+                        height);
+                gameView.getMapView().getMapPanel().add(pokemonFightview, BorderLayout.CENTER);
+                gameView.getMapView().getMapPanel().revalidate();
+                gameView.getMapView().getMapPanel().repaint();
+                try {
+                    saveThread.get(0).interrupt();
+                    saveThread.remove(0);
+                } catch (Exception i) {
+                    i.printStackTrace();
+                }
+
+
+            }
+            else if(isPlayer1 == true){
+                // เพิ่ม HP pokomon ของ Player B
+                System.out.println("player + kill enemy");
+                pokemonFightview = new EventView(-3,
+                        false,
+                        true,
+                        false,
+                        playerB,
+                        true,
+                        width,
+                        height);
+                gameView.getMapView().getMapPanel().add(pokemonFightview, BorderLayout.CENTER);
+                gameView.getMapView().getMapPanel().revalidate();
+                gameView.getMapView().getMapPanel().repaint();
+                try {
+                    saveThread.get(0).interrupt();
+                    saveThread.remove(0);
+                } catch (Exception i) {
+                    i.printStackTrace();
+                }
+
+            }
+        }
     }
     // JoptionPlane =======================================================================
     public  void GetJoptionPlane(){

@@ -6,7 +6,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class EventView extends JPanel {
 
     // atribite ที่ใช้ในการขยับ animations
-    public int xEnemyPokemon = 10, yEnemyPokemon = 10, xPlayerPokenom = 200, yPlayerPokenom = 200, hight = 100, width = 100, xpokeball = 250, ypokeball = 250;
+    public int xEnemyPokemon = 10, yEnemyPokemon = 10, xPlayerPokenom = 200, yPlayerPokenom = 200, hight =0, xpokeball = 250, ypokeball = 250;
     // atribute เอาไว้ เช๋็ค  state ต่างๆ
     public boolean right = true, left = true, top=true, bottom;
     // atribute บอกว่า first เพื่อใช้ ในการต่อสู้ปกติ ของโปรเรม่อน
@@ -16,7 +16,7 @@ public class EventView extends JPanel {
     private Image enemyPokemon, playerPokemon, pokeball, backgroudFighting;
     private String nameEpokemon;
 
-    private boolean fighting, catching, beforeFight;
+    private boolean fighting, catching, beforeFight, dead;
     private int index , randomNum;
 
     private Image Efire1, Efire2, Efire3, Efire4, Eplant1, Eplant2, Eplant3, Eplant4, Erock1, Erock2, Erock3, Erock4, Ewater1, Ewater2,Ewater3, Ewater4,
@@ -33,11 +33,13 @@ public class EventView extends JPanel {
 
 
     //Constructor=================================================================================================================
-    public  EventView(int index, boolean fight, boolean catching, boolean beforeFight, Player p) {
+    public  EventView(int index, boolean fight, boolean catching, boolean beforeFight, Player p,boolean dead, int width, int height) {
+        this.hight = height;
         if(p!=null) {
             playerPokemon = p.getPokemon(0).getPokemonpic();
         }
         catched = new ImageIcon("Event\\cathed-01.png").getImage();
+        this.dead = dead;
 
         //Ememy Pickture
 
@@ -203,21 +205,21 @@ public class EventView extends JPanel {
             System.out.println("เงือ่นไข 4");
             //ตกที่คุก
             backgroudFighting = jail;
-            EnemyPokemon = new Pokemon(null, null,50,5,null);
+            EnemyPokemon = new Pokemon(null, null,0,0,null);
         } else if (index == 10 && fight == false && catching == false) {
             System.out.println("เงือ่นไข 5");
             // shopping
             backgroudFighting = potion;
-            EnemyPokemon = new Pokemon(null, null,50,5,null);
+            EnemyPokemon = new Pokemon(null, null,0,0,null);
         } else if (index == 15 && fight == false && catching == false) {
             System.out.println("เงือ่นไข 6");
             // โรงบาล
             backgroudFighting = heal;
-            EnemyPokemon = new Pokemon(null, null,50,5,null);
+            EnemyPokemon = new Pokemon(null, null,0,0,null);
         } else if (index == 20 && fight == false && catching == false) {
             System.out.println("เงือ่นไข 7");
             //start
-            EnemyPokemon = new Pokemon(null, null,50,5,null);
+            EnemyPokemon = new Pokemon(null, null,0,0,null);
             enemyPokemon = Ewater3;
         }
         if (catching == true) {
@@ -236,6 +238,9 @@ public class EventView extends JPanel {
             backgroudFighting = backgroudFight;
             catched = new ImageIcon("Event\\cathed-01.png").getImage();
         }
+        if(dead == true){
+            backgroudFighting = new ImageIcon("Event\\when enemy died 2.gif").getImage();
+        }
 
 
     }
@@ -248,34 +253,37 @@ public class EventView extends JPanel {
 
         if(index >= 0 &&!this.catching && !this.fighting && index != 5 && index != 10  && index != 15  && index != 20) {
             // map ต่อสู่้ ขนาด 470 x 390
-            g2d.drawImage(backgroudFighting, 0, 0, 380, 380, this);
+            g2d.drawImage(backgroudFighting, 0, 0, (hight+hight/18)/2, (hight+hight/18)/2, this);
             g2d.drawImage(enemyPokemon, xEnemyPokemon, yEnemyPokemon, 150, 150, this);// player
             g2d.drawImage(playerPokemon ,xPlayerPokenom, yPlayerPokenom, 150, 150, this);
         }
         if(index == 5 &&!this.catching && !this.fighting){
-            g2d.drawImage(backgroudFighting, 0, 0, 380, 380, this);
+            g2d.drawImage(backgroudFighting, 0, 0, (hight+hight/18)/2, (hight+hight/18)/2, this);
         }
         if(index == 10 &&!this.catching && !this.fighting){
-            g2d.drawImage(backgroudFighting, 0, 0, 380, 380, this);
+            g2d.drawImage(backgroudFighting, 0, 0, (hight+hight/18)/2, (hight+hight/18)/2, this);
         }
         if(index == 15 &&!this.catching && !this.fighting){
-            g2d.drawImage(backgroudFighting, 0, 0, 380, 380, this);
+            g2d.drawImage(backgroudFighting, 0, 0, (hight+hight/18)/2, (hight+hight/18)/2, this);
         }
         if(index == 20 &&!this.catching && !this.fighting){
-            g2d.drawImage(backgroudFighting, 0, 0, 380, 380, this);
+            g2d.drawImage(backgroudFighting, 0, 0, (hight+hight/18)/2, (hight+hight/18)/2, this);
         }
 
         // จับโปเกม่อน
         if(catching == true && !fighting && index == -1){
-            g.drawImage(backgroudFighting, 0, 0, 360, 360, this);
+            g.drawImage(backgroudFighting, 0, 0, hight/2, hight/2, this);
             g.drawImage(catched, 80,100, 200,200,this);
 
 
         }
         //หน้าโหลด
         if(beforeFight == true){
-            g.drawImage(backgroudFighting, 0, 0, 360, 360, this);
+            g.drawImage(backgroudFighting, 0, 0, hight/2, hight/2, this);
 
+        }
+        if(dead == true){
+            g.drawImage(backgroudFighting, 0, 0, hight/2, hight/2, this);
         }
 
     }

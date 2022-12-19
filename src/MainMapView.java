@@ -21,7 +21,7 @@ public class MainMapView extends JPanel{
 
     public MainMapView(int width, int height){
         // Event view
-        eventView =  new EventView(-2, false, false, true, null);
+        eventView =  new EventView(-2, false, false, true, null, false,width,height );
 
 
         //<--------------------------------------------End Event View---------------------------------------------------->
@@ -90,7 +90,7 @@ public class MainMapView extends JPanel{
         nameLabel2 = new JLabel("Player 2");
         pokeballLabel2 = new JLabel("x3");potionLabel2 = new JLabel("x1");
         rollLabel = new JLabel("ROLL!");
-        settingLabel = new JLabel("Setting");
+        settingLabel = new JLabel("Back to Menu");
         //<-------------Border------------->
         blackline = BorderFactory.createLineBorder(Color.black);
 

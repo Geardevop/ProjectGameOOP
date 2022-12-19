@@ -1,31 +1,33 @@
 import java.awt.*;
 import javax.swing.*;
 public class GameView extends JFrame implements Runnable{
-    private JPanel player1, player2;
+    // <-------------------------------------------------- Change This -------------------------------------------------->
+    private JLabel player1, player2;
     private MainMapView mapView;
     private MainMenuView menuView;
     private int width, height;
+    private Icon playerIcon1, playerIcon2;// <-------------------------------------------------- Change This -------------------------------------------------->
+
     public GameView(int width, int height){
         this.width = width;
         this.height = height;
 
-        Image playerImage1 = Toolkit.getDefaultToolkit().createImage("img/player red.gif");
-        Image playerImage2 = Toolkit.getDefaultToolkit().createImage("img/player blue.gif");
+        if(width == 1280){
+            playerIcon1 = new ImageIcon("img/player_red_small.gif");
+            playerIcon2 = new ImageIcon("img/player_blue_small.gif");
+        }else{
+            playerIcon1 = new ImageIcon("img/player_red_big.gif");
+            playerIcon2 = new ImageIcon("img/player_blue_big.gif");
+        }
 
-        player1 = new ImagePanel(playerImage1, height/24*3/2, height/12*3/2);
-        player2 = new ImagePanel(playerImage2, height/24*3/2, height/12*3/2);
+        player1 = new JLabel(playerIcon1);
+        player2 = new JLabel(playerIcon2);
+
 
         menuView = new MainMenuView(width, height);
 
         mapView = new MainMapView(width, height);
 
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setUndecorated(true);
-        this.setLocationRelativeTo(null);
-        this.setVisible(true);
-    }
-
-    public void run() {
         Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
 
         this.setLayout(null);
@@ -35,9 +37,26 @@ public class GameView extends JFrame implements Runnable{
 
         this.add(menuView);
         menuView.setBounds(0, 0, width, height);
+
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setUndecorated(true);
+        this.setLocationRelativeTo(null);
+        this.setVisible(true);
     }
 
-    public JPanel getPlayer1() {
+    public void run() {
+//        Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
+//
+//        this.setLayout(null);
+//        this.setBounds((int)((dimension.getWidth()-width)/2), (int)((dimension.getHeight()-height)/2), width, height);
+//        Container container = this.getContentPane();
+//        container.setLayout(null);
+//
+//        this.add(menuView);
+//        menuView.setBounds(0, 0, width, height);
+    }
+
+    public JLabel getPlayer1() {
         return player1;
     }
 
@@ -48,8 +67,26 @@ public class GameView extends JFrame implements Runnable{
     public MainMenuView getMenuView() {
         return menuView;
     }
-    public JPanel getPlayer2() {
+
+    public JLabel getPlayer2() {
         return player2;
     }
-}
 
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+
+}
