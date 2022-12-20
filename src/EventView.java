@@ -13,7 +13,8 @@ public class EventView extends JPanel {
     public boolean first = true;
 
     //attribute จะ
-    private Image enemyPokemon, playerPokemon, pokeball, backgroudFighting;
+
+    private Image enemyPokemon, playerPokemon, pokeball, backgroudFighting, pokemonImage;
     private String nameEpokemon;
 
     private boolean fighting, catching, beforeFight, dead;
@@ -21,7 +22,10 @@ public class EventView extends JPanel {
 
     private Image Efire1, Efire2, Efire3, Efire4, Eplant1, Eplant2, Eplant3, Eplant4, Erock1, Erock2, Erock3, Erock4, Ewater1, Ewater2,Ewater3, Ewater4,
     Pfire1, Pfire2, Pfire3, Pfire4, Pplant1, Pplant2, Pplant3, Pplant4, Prock1, Prock2, Prock3, Prock4, Pwater1, Pwater2,Pwater3, Pwater4,
-    jail, heal, potion, backgroudFight ,catched;
+    jail, heal, potion, backgroudFight ,catched, PlayerA, PlayerB;
+
+    private Image fire1, fire2, fire3, fire4, plant1, plant2, plant3, plant4, rock1, rock2, rock3, rock4, water1, water2,water3, water4;
+    private Image[] fireArr = new Image[4], plantArr = new Image[4], rockArr = new Image[4], waterArr = new Image[4];
 
     private Image[] EFirearr= new Image[4], Eplantarr= new Image[4],Erockarr= new Image[4],Ewaterarr= new Image[4];
     private Pokemon EnemyPokemon;
@@ -33,7 +37,7 @@ public class EventView extends JPanel {
 
 
     //Constructor=================================================================================================================
-    public  EventView(int index, boolean fight, boolean catching, boolean beforeFight, Player p,boolean dead, int width, int height) {
+    public  EventView(int index, boolean fight, boolean catching, boolean beforeFight, Player p,Player b,boolean dead, int width, int height) {
         this.hight = height;
         if(p!=null) {
             playerPokemon = p.getPokemon(0).getPokemonpic();
@@ -47,34 +51,50 @@ public class EventView extends JPanel {
         Efire2 = new ImageIcon("EmemyAsset\\fire2 flip.gif").getImage();
         Efire3 = new ImageIcon("EmemyAsset\\fire3 flip.gif").getImage();
         Efire4 = new ImageIcon("EmemyAsset\\fire4 flip.gif").getImage();
-        EFirearr[0] = Efire1;
-        EFirearr[1] = Efire2;
-        EFirearr[2] = Efire3;
-        EFirearr[3] = Efire4;
+        fire1 = Toolkit.getDefaultToolkit().createImage("img/fire1flip.png");
+        fire2 = Toolkit.getDefaultToolkit().createImage("img/fire2flip.png");
+        fire3 = Toolkit.getDefaultToolkit().createImage("img/fire3flip.png");
+        fire4 = Toolkit.getDefaultToolkit().createImage("img/fire4flip.png");
+        EFirearr[0] = Efire1;fireArr[0] = fire1;
+        EFirearr[1] = Efire2;fireArr[1] = fire2;
+        EFirearr[2] = Efire3;fireArr[2] = fire3;
+        EFirearr[3] = Efire4;fireArr[3] = fire4;
         Eplant1 = new ImageIcon("EmemyAsset\\plant1 flip.gif").getImage();
         Eplant2 = new ImageIcon("EmemyAsset\\plant2 flip.gif").getImage();
         Eplant3 = new ImageIcon("EmemyAsset\\plant3 flip.gif").getImage();
         Eplant4 = new ImageIcon("EmemyAsset\\plant4 flip.gif").getImage();
-        Eplantarr[0] = Eplant1;
-        Eplantarr[1] = Eplant2;
-        Eplantarr[2] = Eplant3;
-        Eplantarr[3] = Eplant4;
+        plant1 = Toolkit.getDefaultToolkit().createImage("img/plant1flip.png");
+        plant2 = Toolkit.getDefaultToolkit().createImage("img/plant2flip.png");
+        plant3 = Toolkit.getDefaultToolkit().createImage("img/plant3flip.png");
+        plant4 = Toolkit.getDefaultToolkit().createImage("img/plant4flip.png");
+        Eplantarr[0] = Eplant1;plantArr[0] = plant1;
+        Eplantarr[1] = Eplant2;plantArr[1] = plant2;
+        Eplantarr[2] = Eplant3;plantArr[2] = plant3;
+        Eplantarr[3] = Eplant4;plantArr[3] = plant4;
         Erock1 = new ImageIcon("EmemyAsset\\rock1 flip.gif").getImage();
         Erock2 = new ImageIcon("EmemyAsset\\rock2 flip.gif").getImage();
         Erock3 = new ImageIcon("EmemyAsset\\rock3 flip.gif").getImage();
         Erock4 = new ImageIcon("EmemyAsset\\rock4 flip.gif").getImage();
-        Erockarr[0] = Erock1;
-        Erockarr[1] = Erock2;
-        Erockarr[2] = Erock3;
-        Erockarr[3] = Erock4;
+        rock1 = Toolkit.getDefaultToolkit().createImage("img/rock1flip.png");
+        rock2 = Toolkit.getDefaultToolkit().createImage("img/rock2flip.png");
+        rock3 = Toolkit.getDefaultToolkit().createImage("img/rock3flip.png");
+        rock4 = Toolkit.getDefaultToolkit().createImage("img/rock4flip.png");
+        Erockarr[0] = Erock1;rockArr[0] = rock1;
+        Erockarr[1] = Erock2;rockArr[1] = rock2;
+        Erockarr[2] = Erock3;rockArr[2] = rock3;
+        Erockarr[3] = Erock4;rockArr[3] = rock4;
         Ewater1 = new ImageIcon("EmemyAsset\\water1 flip.gif").getImage();
         Ewater2 = new ImageIcon("EmemyAsset\\water2 flip.gif").getImage();
         Ewater3 = new ImageIcon("EmemyAsset\\water3 flip.gif").getImage();
         Ewater4 = new ImageIcon("EmemyAsset\\water4 flip.gif").getImage();
-        Ewaterarr[0] = Ewater1;
-        Ewaterarr[1] = Ewater2;
-        Ewaterarr[2] = Ewater3;
-        Ewaterarr[3] = Ewater4;
+        water1 = Toolkit.getDefaultToolkit().createImage("img/water1flip.png");
+        water2 = Toolkit.getDefaultToolkit().createImage("img/water2flip.png");
+        water3 = Toolkit.getDefaultToolkit().createImage("img/water3.png");
+        water4 = Toolkit.getDefaultToolkit().createImage("img/water4flip.png");
+        Ewaterarr[0] = Ewater1;waterArr[0] = water1;
+        Ewaterarr[1] = Ewater2;waterArr[1] = water2;
+        Ewaterarr[2] = Ewater3;waterArr[2] = water3;
+        Ewaterarr[3] = Ewater4;waterArr[3] = water4;
         //Player Picture
         Pfire1 = new ImageIcon("EmemyAsset\\fire1.gif").getImage();
         Pfire2 = new ImageIcon("EmemyAsset\\fire2.gif").getImage();
@@ -97,7 +117,7 @@ public class EventView extends JPanel {
         jail = new ImageIcon("Event\\jail-gif.gif").getImage();
         potion = new ImageIcon("Event\\potion-gif.gif").getImage();
         heal = new ImageIcon("Event\\heal-gif.gif").getImage();
-        backgroudFight = new ImageIcon("Event\\center-01.png").getImage();
+        backgroudFight = new ImageIcon("Event\\fightingbackground.png").getImage();
 
 
         // index ช่องปัจจุบันที่ผู็เล่นอยู๋
@@ -109,13 +129,13 @@ public class EventView extends JPanel {
         this.fighting = fight;
         this.catching = catching;
         this.index = index;
-        if (index >= 0 && index < 5 && fight == false && catching == false) {
+        if (index > 0 && index < 5 && fight == false && catching == false) {
             System.out.println("เงือ่นไข 1");
             // 4 ช่องแรก หิน
             int randomNum = ThreadLocalRandom.current().nextInt(0, 3 + 1);
 
             System.out.println("Random Pokemon"+randomNum);
-            enemyPokemon = Erockarr[randomNum];
+            enemyPokemon = Erockarr[randomNum];pokemonImage = rockArr[randomNum];
             switch (randomNum){
                 case 0:
                     nameEpokemon = "rock1";
@@ -131,7 +151,7 @@ public class EventView extends JPanel {
                     break;
             }
             backgroudFighting = backgroudFight;
-            EnemyPokemon = new Pokemon(nameEpokemon, "fire",50,5, enemyPokemon);
+            EnemyPokemon = new Pokemon(nameEpokemon, "fire",50,5, enemyPokemon,pokemonImage );
 
         } else if (index > 5 && index < 10 && fight == false && catching == false) {
             int randomNum = ThreadLocalRandom.current().nextInt(0, 3 + 1);
@@ -152,8 +172,8 @@ public class EventView extends JPanel {
             }
             backgroudFighting = backgroudFight;
             System.out.println("เงือ่นไข 1");
-            enemyPokemon = EFirearr[randomNum];
-            EnemyPokemon = new Pokemon(nameEpokemon, "fire",50,5, enemyPokemon);
+            enemyPokemon = EFirearr[randomNum];pokemonImage = fireArr[randomNum];
+            EnemyPokemon = new Pokemon(nameEpokemon, "fire",50,5, enemyPokemon, pokemonImage);
             // สีช่องที่สอง ไฟ
         } else if (index > 10 && index < 15 && fight == false && catching == false) {
             int randomNum = ThreadLocalRandom.current().nextInt(0, 3+ 1);
@@ -174,8 +194,8 @@ public class EventView extends JPanel {
             }
             backgroudFighting = backgroudFight;
             System.out.println("เงือ่นไข 2");
-            enemyPokemon = Ewaterarr[randomNum];
-            EnemyPokemon = new Pokemon(nameEpokemon, "fire",50,5, enemyPokemon);
+            enemyPokemon = Ewaterarr[randomNum];pokemonImage = waterArr[randomNum];
+            EnemyPokemon = new Pokemon(nameEpokemon, "fire",50,5, enemyPokemon, pokemonImage);
             // สี่ช่องที่สาม น้ำ
         } else if (index > 15 && index < 20 && fight == false && catching == false) {
             backgroudFighting = backgroudFight;
@@ -197,37 +217,30 @@ public class EventView extends JPanel {
 
             int randomNum = ThreadLocalRandom.current().nextInt(0, 3 + 1);
             System.out.println("เงือ่นไข 3");
-            enemyPokemon = Eplantarr[randomNum];
-            EnemyPokemon = new Pokemon(nameEpokemon, "fire",50,5, enemyPokemon);
+            enemyPokemon = Eplantarr[randomNum];pokemonImage = plantArr[randomNum];
+            EnemyPokemon = new Pokemon(nameEpokemon, "fire",50,5, enemyPokemon, pokemonImage);
             System.out.println("Name of Epokenon"+EnemyPokemon.getName());
             //สี่ช่องที่ สี่ ปกติ
         } else if (index == 5 && index < 20 && fight == false && catching == false) {
             System.out.println("เงือ่นไข 4");
             //ตกที่คุก
             backgroudFighting = jail;
-            EnemyPokemon = new Pokemon(null, null,0,0,null);
+            EnemyPokemon = new Pokemon(null, null,0,0,null, null);
         } else if (index == 10 && fight == false && catching == false) {
             System.out.println("เงือ่นไข 5");
             // shopping
             backgroudFighting = potion;
-            EnemyPokemon = new Pokemon(null, null,0,0,null);
+            EnemyPokemon = new Pokemon(null, null,0,0,null, null);
         } else if (index == 15 && fight == false && catching == false) {
             System.out.println("เงือ่นไข 6");
             // โรงบาล
             backgroudFighting = heal;
-            EnemyPokemon = new Pokemon(null, null,0,0,null);
+            EnemyPokemon = new Pokemon(null, null,0,0,null, null);
         } else if (index == 20 && fight == false && catching == false) {
             System.out.println("เงือ่นไข 7");
             //start
-            EnemyPokemon = new Pokemon(null, null,0,0,null);
+            EnemyPokemon = new Pokemon(null, null,0,0,null, null);
             enemyPokemon = Ewater3;
-        }
-        if (catching == true) {
-            //จับ
-        }
-        if (fight = true) {
-            //ต่อสู้
-
         }
         if (beforeFight == true && catching == false && fighting == false) {
             backgroudFighting = new ImageIcon("Event\\bg_bf_roll (3).gif").getImage();
@@ -236,11 +249,22 @@ public class EventView extends JPanel {
         if (this.catching == true && this.index == -1 && this.fighting != true) {
             System.out.println("Catching in Eventview");
             backgroudFighting = backgroudFight;
-            catched = new ImageIcon("Event\\cathed-01.png").getImage();
+            catched = new ImageIcon("Event\\catched-gif.gif").getImage();
         }
         if(dead == true){
-            backgroudFighting = new ImageIcon("Event\\when enemy died 2.gif").getImage();
+            backgroudFighting = new ImageIcon("Event\\when enemy died 3.gif").getImage();
         }
+        // ต่อสู้กันระหว่าง Player and PLayer
+        if(beforeFight == false && fight == true && index == -100){
+            PlayerA = p.getPokemon(0).getPokemonImage();
+            PlayerB = b.getPokemon(0).getPokemonImage();
+            backgroudFighting = backgroudFight;
+        }
+        // หน้าโหลด รอ player เตรียมตัวต่อสู้
+        if(beforeFight == false && fight == true && index == -200){
+            backgroudFighting = new ImageIcon("Event\\vs.gif").getImage();
+        }
+
 
 
     }
@@ -273,7 +297,7 @@ public class EventView extends JPanel {
         // จับโปเกม่อน
         if(catching == true && !fighting && index == -1){
             g.drawImage(backgroudFighting, 0, 0, hight/2, hight/2, this);
-            g.drawImage(catched, 80,100, 200,200,this);
+            g.drawImage(catched, 110,130, 140,100,this);
 
 
         }
@@ -284,6 +308,14 @@ public class EventView extends JPanel {
         }
         if(dead == true){
             g.drawImage(backgroudFighting, 0, 0, hight/2, hight/2, this);
+        }
+        if(beforeFight == false && index == -100){
+            g2d.drawImage(backgroudFighting, 0, 0, (hight+hight/18)/2, (hight+hight/18)/2, this);
+            g2d.drawImage(PlayerA, xEnemyPokemon, yEnemyPokemon, 150, 150, this);// playerA
+            g2d.drawImage(PlayerB ,xPlayerPokenom, yPlayerPokenom, 150, 150, this);// playerA
+        }
+        if(beforeFight == false  && index == -200){
+            g2d.drawImage(backgroudFighting, 0, 0, (hight+hight/18)/2, (hight+hight/18)/2, this);
         }
 
     }

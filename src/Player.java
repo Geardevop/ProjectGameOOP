@@ -10,6 +10,7 @@ public class Player {
     private Potion potion;
     public int max = 6, min = 1, range = max - min + 1;
     private Pokemon pokemon;
+    private Pokemon pokemon1, pokemon2;
     private int MyCountRound;
     private Image startedPokemon;
     private String name;
@@ -19,8 +20,11 @@ public class Player {
         this.MyCountRound = 0;
         this.name = "player "+index;
         startedPokemon = new ImageIcon("PlayerAsset\\water2.gif").getImage();
-        pokemon = new Pokemon("อ่อนด้อย","water",50,10,startedPokemon);
+        Image startedPokemonImage = Toolkit.getDefaultToolkit().createImage("img/water2flip.png");
+
+        pokemon = new Pokemon("OrnDoi","water",50,10,startedPokemon, startedPokemonImage);
         pokemons.add(pokemon);
+
         this.min = 1;
     }
 
@@ -40,6 +44,10 @@ public class Player {
 
     public void addPokemon(Pokemon pokemon) {
         this.pokemons.add(0, pokemon);
+    }
+
+    public void removePokemon(){
+        this.pokemons.remove(0);
     }
 
     //    public Pokemon getPokemon() {

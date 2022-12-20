@@ -40,10 +40,14 @@ public class GameController implements MouseListener, Runnable {
 
     // State
     private boolean boolCatching = false,
-            boolFighting = false,
+            boolviewcatch = false,
             boolBeforeFight = false;
     public int CountRound = 0;
     private boolean stopfight = true;
+    private boolean playerFight = false;
+
+
+    private boolean state = true;
 
     // JoptinPlane
     private String[] response = {"Fight, Catch"};
@@ -70,18 +74,17 @@ public class GameController implements MouseListener, Runnable {
     //<-------------------------------------------------------------------------------------------------------------------------------------------------------------->
 
     public GameController() {
-        gameView = new GameView(width, height);
-        mapView = new MainMapView(width, height);
+
+        //<-------------------------------------Game Control------------------------------------------------>
+        playerA = new Player(1);
+        playerB = new Player(2);
+        gameView = new GameView(width, height, playerA, playerB);
         Thread thread = new Thread(gameView);
         thread.start();
         gameView.getMenuView().getStartPanel().addMouseListener(this);
         gameView.getMenuView().getTutorialPanel().addMouseListener(this);
         gameView.getMenuView().getSettingPanel().addMouseListener(this);
         gameView.getMenuView().getExitPanel().addMouseListener(this);
-        //<-------------------------------------Game Control------------------------------------------------>
-
-        playerA = new Player(1);
-        playerB = new Player(2);
         System.out.println("==================================");
         System.out.println("=Player: name " + playerA.getName() + "=");
         System.out.println("=Have " + playerA.getPokemons().size() + " Pokemon=");
@@ -137,7 +140,7 @@ public class GameController implements MouseListener, Runnable {
             currentPosition1 = 0;
             currentPosition2 = 0;
             gameView.dispose();
-            gameView = new GameView(width, height);
+            gameView = new GameView(width, height, playerA, playerB);
             gameView.getMenuView().getStartPanel().addMouseListener(this);
             gameView.getMenuView().getTutorialPanel().addMouseListener(this);
             gameView.getMenuView().getSettingPanel().addMouseListener(this);
@@ -154,40 +157,43 @@ public class GameController implements MouseListener, Runnable {
             setting.getBackPanel().addMouseListener(this);
         }
         else if (e.getSource().equals(gameView.getMapView().getRollPanel())) {
-            randomNum = ThreadLocalRandom.current().nextInt(1, 6 + 1);
+            System.out.println("state" +state);
+            randomNum = ThreadLocalRandom.current().nextInt(5, 6 + 1);
             this.random = randomNum;
 //            currentPosition += randomNum;
             currentPosition1 %= 20;
             currentPosition2 %= 20;
             //<------------------------------------------Event Controll-------------------------------------------------------------------=>
-
-            if (isPlayer1 == true) {
-                gameView.getPlayer1().setBounds(mapPositionWidth[currentPosition1] - height / 48, mapPositionHeight[currentPosition1] - height / 48, height / 24 * 3 / 2, height / 12 * 3 / 2);
-                new java.util.Timer().schedule(
-                        new java.util.TimerTask() {
-                            public void run() {
-                                //code run here
-                                go(playerA, false);
-                            }
-                        }, 10
-                );
-                isPlayer1 = !isPlayer1;
-                CountRun++;
-            } else {
-                gameView.getPlayer2().setBounds(mapPositionWidth[currentPosition2] + height / 48, mapPositionHeight[currentPosition2] - height / 24, height / 24 * 3 / 2, height / 12 * 3 / 2);
-                new java.util.Timer().schedule(
-                        new java.util.TimerTask() {
-                            public void run() {
-                                //code run here
-                                go(playerB, false);
-                            }
-                        }, 250
-                );
-                System.out.println(playerB.getName());
-                CountRun++;
-                isPlayer1 =!isPlayer1;
+            if(state == true) {
+                if (isPlayer1 == true) {
+                    gameView.getPlayer1().setBounds(mapPositionWidth[currentPosition1] - height / 48, mapPositionHeight[currentPosition1] - height / 48, height / 24 * 3 / 2, height / 12 * 3 / 2);
+                    new java.util.Timer().schedule(
+                            new java.util.TimerTask() {
+                                public void run() {
+                                    //code run here
+                                    go(playerA, false);
+                                }
+                            }, 10
+                    );
+                    isPlayer1 = !isPlayer1;
+                    CountRun++;
+                } else {
+                    gameView.getPlayer2().setBounds(mapPositionWidth[currentPosition2] + height / 48, mapPositionHeight[currentPosition2] - height / 24, height / 24 * 3 / 2, height / 12 * 3 / 2);
+                    new java.util.Timer().schedule(
+                            new java.util.TimerTask() {
+                                public void run() {
+                                    //code run here
+                                    go(playerB, false);
+                                }
+                            }, 250
+                    );
+                    System.out.println(playerB.getName());
+                    CountRun++;
+                    isPlayer1 = !isPlayer1;
+                }
+                CountRoll += 1;
+                state = false;
             }
-            CountRoll += 1;
         }
         else if(e.getSource().equals(setting.getFalseFullScreenPanel())){
             setting.getSetting().remove(setting.getFalseFullScreenPanel());
@@ -240,7 +246,7 @@ public class GameController implements MouseListener, Runnable {
         else if(e.getSource().equals(setting.getSavePanel())){
             setting.getWindow().dispose();
             gameView.dispose();
-            gameView = new GameView(width, height);
+            gameView = new GameView(width, height, playerA, playerB);
             gameView.getMenuView().getStartPanel().addMouseListener(this);
             gameView.getMenuView().getTutorialPanel().addMouseListener(this);
             gameView.getMenuView().getSettingPanel().addMouseListener(this);
@@ -373,193 +379,268 @@ public class GameController implements MouseListener, Runnable {
 
     // เปลี่ยนหน้าตัวละคร -----------------------------------------------------------------------------------------------
     public void ChangeEvent(Player p, boolean catching) {
-        System.out.println("isPlaye r"+isPlayer1);
-        System.out.println("First"+ FirstPerson);
-        if (catching == false) {
-            //<----------------------------------------------Rolling----------------------------------->
-            //dddd
-            p.setCurrentPoint(p.getBeforePoint() + random);
-            if (isPlayer1 == false) {
-                currentPosition1 += random;
-                currentPosition1 %= 20;
-            } else {
-                currentPosition2 += random;
-                currentPosition2 %= 20;
-            }
-            if (p.getCurrentPoint() > 20) {
-                p.setCurrentPoint(p.getCurrentPoint() % 20);
-                p.setMyCountRound(1);
-                CountRound += 1;
-                EndRound(CountRound);
-            }
-            System.out.println(p.getName() + "สุ่มได้ " + randomNum + " CurrentPoint is Player" + p.getName() + " are " + p.getCurrentPoint());
-            p.setBeforePoint(p.getCurrentPoint());
-            System.out.println("After Rolling :" + p.getCurrentPoint());
-            //<----------------------------------------------Rolling----------------------------------->
-            //ตาแรกนะครับ
-            if (isPlayer1 == false) {
-//                FirstPerson+=1;
-//                System.out.println("<<<<<<<<<<<<<<FistTime>>>>>>>>>>>>>");
-//                // wait ตามจำนวนเวลาที่ถอยลูกเต๋า
-//                try {
-//                    Thread.sleep(350);
-//                } catch (Exception i) {
-//                    i.printStackTrace();
-//                }
-//                pokemonFightview = new EventView(5,
-//                        false,
-//                        false,
-//                        false,
-//                        p,
-//                        false);
-//                System.out.println("Change!!!");
-//                gameView.getMapView().getMapPanel().remove(gameView.getMapView().getEventView());
-//                gameView.getMapView().getMapPanel().add(pokemonFightview, BorderLayout.CENTER);
-//                gameView.getMapView().getMapPanel().revalidate();
-//                gameView.getMapView().getMapPanel().repaint();
-//                gameView.getPlayer1().setBounds(mapPositionWidth[currentPosition1] - height / 48, mapPositionHeight[currentPosition1] - height / 48, height / 24 * 3 / 2, height / 12 * 3 / 2);
-//                gameView.getPlayer2().setBounds(mapPositionWidth[currentPosition2] + height / 48, mapPositionHeight[currentPosition2] - height / 24, height / 24 * 3 / 2, height / 12 * 3 / 2);
-//                gameView.getPlayer1().repaint();
-//                // สั้งให้ต่อสู้
-//                System.out.println("Enemy pokemon =" + pokemonFightview.getEnemyPokemon().getName());
-//                if (gameView.getMapView().getMapPanel().isDisplayable() && FirstPerson !=0 && (p.getCurrentPoint()!= 5 ||p.getCurrentPoint()!= 10 ||p.getCurrentPoint()!= 15))
-//                {
-//                    move(gameView,  pokemonFightview, p);
-//                }
-                // ขยับ CheckRound
-                BorderLayout layout = (BorderLayout) gameView.getMapView().getMapPanel().getLayout();
-                gameView.getMapView().getMapPanel().remove(layout.getLayoutComponent(BorderLayout.CENTER));
-                gameView.getMapView().getMapPanel().revalidate();
-                gameView.getMapView().getMapPanel().repaint();
-                gameView.getPlayer1().setBounds(mapPositionWidth[currentPosition1] - height / 48, mapPositionHeight[currentPosition1] - height / 48, height / 24 * 3 / 2, height / 12 * 3 / 2);
-                gameView.getPlayer2().setBounds(mapPositionWidth[currentPosition2] + height / 48, mapPositionHeight[currentPosition2] - height / 24, height / 24 * 3 / 2, height / 12 * 3 / 2);
-                gameView.getPlayer1().repaint();
-                pokemonFightview = new EventView(-2, false, false, true, p, false, width, height);
-                gameView.getMapView().getMapPanel().add(pokemonFightview, BorderLayout.CENTER);
-                gameView.getMapView().getMapPanel().revalidate();
-                gameView.getMapView().getMapPanel().repaint();
-                gameView.getPlayer1().setBounds(mapPositionWidth[currentPosition1] - height / 48, mapPositionHeight[currentPosition1] - height / 48, height / 24 * 3 / 2, height / 12 * 3 / 2);
-                gameView.getPlayer2().setBounds(mapPositionWidth[currentPosition2] + height / 48, mapPositionHeight[currentPosition2] - height / 24, height / 24 * 3 / 2, height / 12 * 3 / 2);
-                gameView.getPlayer1().repaint();
-                try {
-                    Thread.sleep(5000);
-                } catch (Exception i) {
-                    i.printStackTrace();
-                }
-                try {
-                    System.out.println("=============================Two========================");
-                    System.out.println("this is Current" + p.getCurrentPoint());
-                    pokemonFightview = new EventView(p.getCurrentPoint(),
-                            false,
-                            false,
-                            false,
-                            p,
-                            false,
-                            width,
-                            height);
-                    gameView.getMapView().getMapPanel().remove(layout.getLayoutComponent(BorderLayout.CENTER));
-                    gameView.getMapView().getMapPanel().revalidate();
-                    gameView.getMapView().getMapPanel().repaint();
-                    gameView.getPlayer1().setBounds(mapPositionWidth[currentPosition1] - height / 48, mapPositionHeight[currentPosition1] - height / 48, height / 24 * 3 / 2, height / 12 * 3 / 2);
-                    gameView.getPlayer2().setBounds(mapPositionWidth[currentPosition2] + height / 48, mapPositionHeight[currentPosition2] - height / 24, height / 24 * 3 / 2, height / 12 * 3 / 2);
-                    gameView.getPlayer1().repaint();
-                    gameView.getMapView().getMapPanel().add(pokemonFightview, BorderLayout.CENTER);
-                    gameView.getMapView().getMapPanel().revalidate();
-                    gameView.getMapView().getMapPanel().repaint();
-                    gameView.getPlayer1().setBounds(mapPositionWidth[currentPosition1] - height / 48, mapPositionHeight[currentPosition1] - height / 48, height / 24 * 3 / 2, height / 12 * 3 / 2);
-                    gameView.getPlayer2().setBounds(mapPositionWidth[currentPosition2] + height / 48, mapPositionHeight[currentPosition2] - height / 24, height / 24 * 3 / 2, height / 12 * 3 / 2);
-                    gameView.getPlayer1().repaint();
-                    if (gameView.getMapView().getMapPanel().isDisplayable() && (p.getCurrentPoint()!= 5 ||p.getCurrentPoint()!= 10 ||p.getCurrentPoint()!= 15))
-                        System.out.println("Attack!");
-                    {
-                        move(gameView,  pokemonFightview, p);
-                    }
-                } catch (Exception i) {
-                    i.printStackTrace();
-                }
-
-            }
-            // ถ้าCatching ไม่เท่ากับ true หมายความว่า animation ที่กำลังจะสรา้งจะเป็น อนิเมชั่นต่อสู้ทันที่
-            if (isPlayer1== true) {
-                //<-------------------------Two----------------------------------------------------------->
-                // หยุดการทำงานของ Thread และ ลบ Thread ตัวนั้นออกจาก List
-                BorderLayout layout = (BorderLayout) gameView.getMapView().getMapPanel().getLayout();
-                gameView.getMapView().getMapPanel().remove(layout.getLayoutComponent(BorderLayout.CENTER));
-                gameView.getMapView().getMapPanel().revalidate();
-                gameView.getMapView().getMapPanel().repaint();
-                gameView.getPlayer1().setBounds(mapPositionWidth[currentPosition1] - height / 48, mapPositionHeight[currentPosition1] - height / 48, height / 24 * 3 / 2, height / 12 * 3 / 2);
-                gameView.getPlayer2().setBounds(mapPositionWidth[currentPosition2] + height / 48, mapPositionHeight[currentPosition2] - height / 24, height / 24 * 3 / 2, height / 12 * 3 / 2);
-                gameView.getPlayer1().repaint();
-                pokemonFightview = new EventView(-2, false, false, true, p, false,width,height);
-                gameView.getMapView().getMapPanel().add(pokemonFightview, BorderLayout.CENTER);
-                gameView.getMapView().getMapPanel().revalidate();
-                gameView.getMapView().getMapPanel().repaint();
-                gameView.getPlayer1().setBounds(mapPositionWidth[currentPosition1] - height / 48, mapPositionHeight[currentPosition1] - height / 48, height / 24 * 3 / 2, height / 12 * 3 / 2);
-                gameView.getPlayer2().setBounds(mapPositionWidth[currentPosition2] + height / 48, mapPositionHeight[currentPosition2] - height / 24, height / 24 * 3 / 2, height / 12 * 3 / 2);
-                gameView.getPlayer1().repaint();
-                try {
-                    Thread.sleep(5000);
-                } catch (Exception i) {
-                    i.printStackTrace();
-                }
-                try {
-                    System.out.println("=============================Two========================");
-                    System.out.println("this is Current" + p.getCurrentPoint());
-                    pokemonFightview = new EventView(p.getCurrentPoint(),
-                            false,
-                            false,
-                            false,
-                            p,
-                            false,
-                            width,
-                            height);
-                    gameView.getMapView().getMapPanel().remove(layout.getLayoutComponent(BorderLayout.CENTER));
-                    gameView.getMapView().getMapPanel().revalidate();
-                    gameView.getMapView().getMapPanel().repaint();
-                    gameView.getPlayer1().setBounds(mapPositionWidth[currentPosition1] - height / 48, mapPositionHeight[currentPosition1] - height / 48, height / 24 * 3 / 2, height / 12 * 3 / 2);
-                    gameView.getPlayer2().setBounds(mapPositionWidth[currentPosition2] + height / 48, mapPositionHeight[currentPosition2] - height / 24, height / 24 * 3 / 2, height / 12 * 3 / 2);
-                    gameView.getPlayer1().repaint();
-                    gameView.getMapView().getMapPanel().add(pokemonFightview, BorderLayout.CENTER);
-                    gameView.getMapView().getMapPanel().revalidate();
-                    gameView.getMapView().getMapPanel().repaint();
-                    gameView.getPlayer1().setBounds(mapPositionWidth[currentPosition1] - height / 48, mapPositionHeight[currentPosition1] - height / 48, height / 24 * 3 / 2, height / 12 * 3 / 2);
-                    gameView.getPlayer2().setBounds(mapPositionWidth[currentPosition2] + height / 48, mapPositionHeight[currentPosition2] - height / 24, height / 24 * 3 / 2, height / 12 * 3 / 2);
-                    gameView.getPlayer1().repaint();
-                    if (gameView.getMapView().getMapPanel().isDisplayable()  && (p.getCurrentPoint()!= 5 ||p.getCurrentPoint()!= 10 ||p.getCurrentPoint()!= 15))
-                        System.out.println("Attack!");
-                    {
-                        move(gameView,  pokemonFightview, p);
-                    }
-                } catch (Exception i) {
-                    i.printStackTrace();
-                }
-            }
-            CheckFirstRound += 1;
-            gameView.getPlayer1().repaint();
-        }
-        // สำหรับหน้าที่กำลังจับโปเกม่อน
-        if (catching == true) {
-            System.out.println("Catching in ChangeEvent");
-            pokemonFightview = new EventView(-1,
-                    false,
-                    true,
-                    false,
-                    p,
-                    false,
-                     width,
-                    height);
-            gameView.getMapView().getMapPanel().add(pokemonFightview, BorderLayout.CENTER);
+        System.out.println("=========================");
+        System.out.println("รอบที่" +CountRound);
+        System.out.println("=========================");
+        if(CountRound >=2){
+            BorderLayout layout = (BorderLayout) gameView.getMapView().getMapPanel().getLayout();
+            gameView.getMapView().getMapPanel().remove(layout.getLayoutComponent(BorderLayout.CENTER));
             gameView.getMapView().getMapPanel().revalidate();
             gameView.getMapView().getMapPanel().repaint();
+            gameView.getPlayer1().setBounds(mapPositionWidth[currentPosition1] - height / 48, mapPositionHeight[currentPosition1] - height / 48, height / 24 * 3 / 2, height / 12 * 3 / 2);
+            gameView.getPlayer2().setBounds(mapPositionWidth[currentPosition2] + height / 48, mapPositionHeight[currentPosition2] - height / 24, height / 24 * 3 / 2, height / 12 * 3 / 2);
+            gameView.getPlayer1().repaint();
+        }else{
+            if (catching == false) {
+                //<----------------------------------------------Rolling----------------------------------->
+                //dddd
+                p.setCurrentPoint(p.getBeforePoint() + random);
+                if (isPlayer1 == false) {
+                    currentPosition1 += random;
+                    currentPosition1 %= 20;
+                } else {
+                    currentPosition2 += random;
+                    currentPosition2 %= 20;
+                }
+                if (p.getCurrentPoint() > 20) {
+                    p.setCurrentPoint(p.getCurrentPoint() % 20);
+                    p.setMyCountRound(1);
+                    CountRound += 1;
+                    EndRound(CountRound);
+                }
+                System.out.println(p.getName() + "สุ่มได้ " + randomNum + " CurrentPoint is Player" + p.getName() + " are " + p.getCurrentPoint());
+                p.setBeforePoint(p.getCurrentPoint());
+                System.out.println("After Rolling :" + p.getCurrentPoint());
+                //<----------------------------------------------Rolling----------------------------------->
+                //ตาแรกนะครับ
+                if (isPlayer1 == false) {
+
+                    // ขยับ CheckRound
+                    BorderLayout layout = (BorderLayout) gameView.getMapView().getMapPanel().getLayout();
+                    gameView.getMapView().getMapPanel().remove(layout.getLayoutComponent(BorderLayout.CENTER));
+                    gameView.getMapView().getMapPanel().revalidate();
+                    gameView.getMapView().getMapPanel().repaint();
+                    gameView.getPlayer1().setBounds(mapPositionWidth[currentPosition1] - height / 48, mapPositionHeight[currentPosition1] - height / 48, height / 24 * 3 / 2, height / 12 * 3 / 2);
+                    gameView.getPlayer2().setBounds(mapPositionWidth[currentPosition2] + height / 48, mapPositionHeight[currentPosition2] - height / 24, height / 24 * 3 / 2, height / 12 * 3 / 2);
+                    gameView.getPlayer1().repaint();
+                    pokemonFightview = new EventView(-2, false, false, true, p,playerB, false, width, height);
+                    gameView.getMapView().getMapPanel().add(pokemonFightview, BorderLayout.CENTER);
+                    gameView.getMapView().getMapPanel().revalidate();
+                    gameView.getMapView().getMapPanel().repaint();
+                    gameView.getPlayer1().setBounds(mapPositionWidth[currentPosition1] - height / 48, mapPositionHeight[currentPosition1] - height / 48, height / 24 * 3 / 2, height / 12 * 3 / 2);
+                    gameView.getPlayer2().setBounds(mapPositionWidth[currentPosition2] + height / 48, mapPositionHeight[currentPosition2] - height / 24, height / 24 * 3 / 2, height / 12 * 3 / 2);
+                    gameView.getPlayer1().repaint();
+                    try {
+                        Thread.sleep(5000);
+                    } catch (Exception i) {
+                        i.printStackTrace();
+                    }
+                    try {
+                        System.out.println("=============================Two========================");
+                        System.out.println("this is Current" + p.getCurrentPoint());
+                        pokemonFightview = new EventView(p.getCurrentPoint(),
+                                false,
+                                false,
+                                false,
+                                p,
+                                playerB,
+                                false,
+                                width,
+                                height);
+                        gameView.getMapView().getMapPanel().remove(layout.getLayoutComponent(BorderLayout.CENTER));
+                        gameView.getMapView().getMapPanel().revalidate();
+                        gameView.getMapView().getMapPanel().repaint();
+                        gameView.getPlayer1().setBounds(mapPositionWidth[currentPosition1] - height / 48, mapPositionHeight[currentPosition1] - height / 48, height / 24 * 3 / 2, height / 12 * 3 / 2);
+                        gameView.getPlayer2().setBounds(mapPositionWidth[currentPosition2] + height / 48, mapPositionHeight[currentPosition2] - height / 24, height / 24 * 3 / 2, height / 12 * 3 / 2);
+                        gameView.getPlayer1().repaint();
+                        gameView.getMapView().getMapPanel().add(pokemonFightview, BorderLayout.CENTER);
+                        gameView.getMapView().getMapPanel().revalidate();
+                        gameView.getMapView().getMapPanel().repaint();
+                        gameView.getPlayer1().setBounds(mapPositionWidth[currentPosition1] - height / 48, mapPositionHeight[currentPosition1] - height / 48, height / 24 * 3 / 2, height / 12 * 3 / 2);
+                        gameView.getPlayer2().setBounds(mapPositionWidth[currentPosition2] + height / 48, mapPositionHeight[currentPosition2] - height / 24, height / 24 * 3 / 2, height / 12 * 3 / 2);
+                        gameView.getPlayer1().repaint();
+                        if (p.getCurrentPoint() == 5 || p.getCurrentPoint() == 10 || p.getCurrentPoint() == 15) {
+                            state = true;
+                        }
+                        if (gameView.getMapView().getMapPanel().isDisplayable() && (p.getCurrentPoint() != 5 && p.getCurrentPoint() != 10 && p.getCurrentPoint() != 15 && p.getCurrentPoint() != 20))
+                            System.out.println("Attack!");
+                        {
+                            move(gameView, pokemonFightview, p);
+                        }
+                    } catch (Exception i) {
+                        i.printStackTrace();
+                    }
+
+                }
+                // ถ้าCatching ไม่เท่ากับ true หมายความว่า animation ที่กำลังจะสรา้งจะเป็น อนิเมชั่นต่อสู้ทันที่
+                if (isPlayer1 == true) {
+
+                    //<-------------------------Two----------------------------------------------------------->
+                    // หยุดการทำงานของ Thread และ ลบ Thread ตัวนั้นออกจาก List
+                    BorderLayout layout = (BorderLayout) gameView.getMapView().getMapPanel().getLayout();
+                    gameView.getMapView().getMapPanel().remove(layout.getLayoutComponent(BorderLayout.CENTER));
+                    gameView.getMapView().getMapPanel().revalidate();
+                    gameView.getMapView().getMapPanel().repaint();
+                    gameView.getPlayer1().setBounds(mapPositionWidth[currentPosition1] - height / 48, mapPositionHeight[currentPosition1] - height / 48, height / 24 * 3 / 2, height / 12 * 3 / 2);
+                    gameView.getPlayer2().setBounds(mapPositionWidth[currentPosition2] + height / 48, mapPositionHeight[currentPosition2] - height / 24, height / 24 * 3 / 2, height / 12 * 3 / 2);
+                    gameView.getPlayer1().repaint();
+                    pokemonFightview = new EventView(-2, false, false, true, p,playerA, false, width, height);
+                    gameView.getMapView().getMapPanel().add(pokemonFightview, BorderLayout.CENTER);
+                    gameView.getMapView().getMapPanel().revalidate();
+                    gameView.getMapView().getMapPanel().repaint();
+                    gameView.getPlayer1().setBounds(mapPositionWidth[currentPosition1] - height / 48, mapPositionHeight[currentPosition1] - height / 48, height / 24 * 3 / 2, height / 12 * 3 / 2);
+                    gameView.getPlayer2().setBounds(mapPositionWidth[currentPosition2] + height / 48, mapPositionHeight[currentPosition2] - height / 24, height / 24 * 3 / 2, height / 12 * 3 / 2);
+                    gameView.getPlayer1().repaint();
+                    try {
+                        Thread.sleep(5000);
+                    } catch (Exception i) {
+                        i.printStackTrace();
+                    }
+                    try {
+                        System.out.println("=============================Two========================");
+                        System.out.println("this is Current" + p.getCurrentPoint());
+                        pokemonFightview = new EventView(p.getCurrentPoint(),
+                                false,
+                                false,
+                                false,
+                                p,
+                                playerA,
+                                false,
+                                width,
+                                height);
+
+                        gameView.getMapView().getMapPanel().remove(layout.getLayoutComponent(BorderLayout.CENTER));
+                        gameView.getMapView().getMapPanel().revalidate();
+                        gameView.getMapView().getMapPanel().repaint();
+                        gameView.getPlayer1().setBounds(mapPositionWidth[currentPosition1] - height / 48, mapPositionHeight[currentPosition1] - height / 48, height / 24 * 3 / 2, height / 12 * 3 / 2);
+                        gameView.getPlayer2().setBounds(mapPositionWidth[currentPosition2] + height / 48, mapPositionHeight[currentPosition2] - height / 24, height / 24 * 3 / 2, height / 12 * 3 / 2);
+                        gameView.getPlayer1().repaint();
+                        gameView.getMapView().getMapPanel().add(pokemonFightview, BorderLayout.CENTER);
+                        gameView.getMapView().getMapPanel().revalidate();
+                        gameView.getMapView().getMapPanel().repaint();
+                        gameView.getPlayer1().setBounds(mapPositionWidth[currentPosition1] - height / 48, mapPositionHeight[currentPosition1] - height / 48, height / 24 * 3 / 2, height / 12 * 3 / 2);
+                        gameView.getPlayer2().setBounds(mapPositionWidth[currentPosition2] + height / 48, mapPositionHeight[currentPosition2] - height / 24, height / 24 * 3 / 2, height / 12 * 3 / 2);
+                        gameView.getPlayer1().repaint();
+                        if (p.getCurrentPoint() == 5 || p.getCurrentPoint() == 10 || p.getCurrentPoint() == 15) {
+                            state = true;
+                        }
+                        if (gameView.getMapView().getMapPanel().isDisplayable() && (p.getCurrentPoint() != 5 && p.getCurrentPoint() != 10 && p.getCurrentPoint() != 15 && p.getCurrentPoint() != 20))
+                            System.out.println("Attack!");
+                        {
+                            move(gameView, pokemonFightview, p);
+                        }
+                    } catch (Exception i) {
+                        i.printStackTrace();
+                    }
+
+                }
+                CheckFirstRound += 1;
+                gameView.getPlayer1().repaint();
+
+            }
+            // สำหรับหน้าที่กำลังจับโปเกม่อน
+            if (catching == true) {
+                System.out.println("Catching in ChangeEvent");
+                pokemonFightview = new EventView(-1,
+                        false,
+                        true,
+                        false,
+                        p,
+                        playerA,
+                        false,
+                        width,
+                        height);
+                BorderLayout layout = (BorderLayout) gameView.getMapView().getMapPanel().getLayout();
+                gameView.getMapView().getMapPanel().remove(layout.getLayoutComponent(BorderLayout.CENTER));
+                gameView.getMapView().getMapPanel().add(pokemonFightview, BorderLayout.CENTER);
+                gameView.getMapView().getMapPanel().revalidate();
+                gameView.getMapView().getMapPanel().repaint();
+
+            }
         }
     }
 
-    //RepainView ===========================================================
+
+    //Player Fighting ==========================================================================================================================================================================
+    public void playerFight(JFrame gameView, EventView eventView, Player playerA, Player PlayerB) {
+        try {
+            // อยากจะให้เริ่มเดินเมื่อไหร่ ปรับตรงนี้ ถ้าตอนการให้เดินเลย ปรับให้เท่ากับข้างบน
+            Thread.sleep(50);
+            if (stopfight) {
+                while (true) {
+                    if (eventView.first) {
+                        FightingA(gameView, eventView, playerA, PlayerB);
+                    } else {
+                        FightingB(gameView, eventView, playerA, PlayerB);
+                    }
+                }
+            } else {
+                System.out.println("not run");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    public void FightingA(JFrame gameView, EventView eventView, Player A, Player B){
+        try {
+            TimeUnit.MILLISECONDS.sleep(5);
+            if (eventView.right) {
+                eventView.xEnemyPokemon++;
+                if (eventView.xEnemyPokemon == 100) {
+                    //Fighting
+                    eventView.right = false;
+                }
+            }
+            if (!eventView.right) {
+                eventView.xEnemyPokemon--;
+                if (eventView.xEnemyPokemon == 0) {
+                    gameView.repaint();
+                    pauseBlack();
+                    eventView.right = true;
+                    eventView.first = false;
+                }
+            }
+            gameView.repaint();
+
+        }
+        catch (InterruptedException i) {
+            Thread.currentThread().interrupt();
+        }
+
+    }
+    public void FightingB(JFrame gameView, EventView eventView, Player A, Player B){
+        try {
+            TimeUnit.MILLISECONDS.sleep(5);
+            if (eventView.left) {
+                eventView.xPlayerPokenom--;
+                if (eventView.xPlayerPokenom == 150) {
+                        //Fighting
+                    eventView.left = false;
+                }
+            }
+            if (!eventView.left) {
+                eventView.xPlayerPokenom++;
+                if (eventView.xPlayerPokenom == 200) {
+                    gameView.repaint();
+                    pauseBlack();
+                    eventView.left = true;
+                    eventView.first = true;
+                }
+            }
+            gameView.repaint();
+        } catch (InterruptedException i) {
+            Thread.currentThread().interrupt();
+        }
+
+    }
+
 
 
     // Move โปนเกม่อน>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     public void move(JFrame gameView, EventView eventView, Player player) {
         try {
+            boolviewcatch = false;
             warring = 0;
             // อยากจะให้เริ่มเดินเมื่อไหร่ ปรับตรงนี้ ถ้าตอนการให้เดินเลย ปรับให้เท่ากับข้างบน
             Thread.sleep(50);
@@ -673,10 +754,14 @@ public class GameController implements MouseListener, Runnable {
 
     // ทำหน้าจับหรือปล่อย โปรเกม่อน
     public void EnemyAttack(Pokemon enemypokemon, Pokemon playerpokemon) {
-        enemypokemon.attack(playerpokemon);
+        if(enemypokemon.getHP() > 30) {
+            enemypokemon.attack(playerpokemon);
+        }
 
     }
     public void PlayerAttack(Pokemon playerpokenon, Pokemon enmemypokemon) {
+        BorderLayout layout = (BorderLayout) gameView.getMapView().getMapPanel().getLayout();
+        System.out.println("boolviewCatch"+boolviewcatch);
         playerpokenon.attack(enmemypokemon);
         if (enmemypokemon.getHP() < 30 && warring == 0) {
             warring += 1;
@@ -685,85 +770,181 @@ public class GameController implements MouseListener, Runnable {
             int response = JOptionPane.showOptionDialog(null, "Enemy Pokemon LOW!", "Catch Or Fight",
                     JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,
                     null, options, options[0]);
+
             if(response == 0) {
+                if(CountRound >=3){
+                    playerFight = true;
+                }
+                boolviewcatch = true;
                 if (isPlayer1 == false) {
                     playerA.getPokemons().add(enmemypokemon);
+                    if(playerA.getPokemons().size()==2){
+                        JPanel pokemon2_1 = new ImagePanel(playerA.getPokemons().get(1).getPokemonImage(), height/12, height/12);
+                        pokemon2_1.setPreferredSize(new Dimension(height/12, height/12));
+                        pokemon2_1.setBackground(new Color(0,0,0,0));
+                        gameView.getMapView().setPokemon2_1(pokemon2_1);
+                        gameView.getMapView().getPokemon2Panel1().add(gameView.getMapView().getPokemon2_1());
+                        gameView.getMapView().revalidate();
+                        gameView.getMapView().repaint();
+                    }else if(playerA.getPokemons().size()==3){
+                        JPanel pokemon3_1 = new ImagePanel(playerA.getPokemons().get(2).getPokemonImage(), height/12, height/12);
+                        pokemon3_1.setPreferredSize(new Dimension(height/12, height/12));
+                        pokemon3_1.setBackground(new Color(0,0,0,0));
+                        gameView.getMapView().setPokemon3_1(pokemon3_1);
+                        gameView.getMapView().getPokemon3Panel1().add(gameView.getMapView().getPokemon3_1());
+                        gameView.getMapView().revalidate();
+                        gameView.getMapView().repaint();
+                    }else{
+                        playerA.removePokemon();
+                        gameView.getMapView().getPokemon1Panel1().remove(gameView.getMapView().getPokemon1_1());
+                        JPanel pokemon1_1 = new ImagePanel(playerA.getPokemons().get(0).getPokemonImage(), height/12, height/12);
+                        pokemon1_1.setPreferredSize(new Dimension(height/12, height/12));
+                        pokemon1_1.setBackground(new Color(0,0,0,0));
+                        gameView.getMapView().setPokemon1_1(pokemon1_1);
+                        gameView.getMapView().getPokemon1Panel1().add(pokemon1_1);
+
+                        gameView.getMapView().getPokemon2Panel1().remove(gameView.getMapView().getPokemon2_1());
+                        JPanel pokemon2_1 = new ImagePanel(playerA.getPokemons().get(1).getPokemonImage(), height/12, height/12);
+                        pokemon2_1.setPreferredSize(new Dimension(height/12, height/12));
+                        pokemon2_1.setBackground(new Color(0,0,0,0));
+                        gameView.getMapView().setPokemon2_1(pokemon2_1);
+                        gameView.getMapView().getPokemon2Panel1().add(pokemon2_1);
+
+                        gameView.getMapView().getPokemon3Panel1().remove(gameView.getMapView().getPokemon3_1());
+                        JPanel pokemon3_1 = new ImagePanel(playerA.getPokemons().get(2).getPokemonImage(), height/12, height/12);
+                        pokemon3_1.setPreferredSize(new Dimension(height/12, height/12));
+                        pokemon3_1.setBackground(new Color(0,0,0,0));
+                        gameView.getMapView().setPokemon3_1(pokemon3_1);
+                        gameView.getMapView().getPokemon3Panel1().add(pokemon3_1);
+
+                        gameView.getMapView().getVariousMenuPanel().revalidate();
+                        gameView.getMapView().getVariousMenuPanel().repaint();
+                    }
+
                     System.out.println("Now A have pokemon "+playerB.getPokemons().size());
-                    BorderLayout layout = (BorderLayout) gameView.getMapView().getMapPanel().getLayout();
                     gameView.getMapView().getMapPanel().remove(layout.getLayoutComponent(BorderLayout.CENTER));
                     pokemonFightview = new EventView(-1,
                             false,
                             true,
                             false,
                             playerA,
+                            playerB,
                             false,
                             width,
                             height);
+                    try{
+                        Thread.sleep(5);
+                        saveThread.get(0).interrupt();
+                        saveThread.remove(0);
+                    }catch(Exception e){
+                        Thread.currentThread().interrupt(); // propagate interrupt
+                    }
+
                     gameView.getMapView().getMapPanel().add(pokemonFightview, BorderLayout.CENTER);
                     gameView.getMapView().getMapPanel().revalidate();
                     gameView.getMapView().getMapPanel().repaint();
+
+
                 } else {
                     playerB.getPokemons().add(enmemypokemon);
-                    System.out.println("Now b have pokemon "+playerB.getPokemons().size());
-                    BorderLayout layout = (BorderLayout) gameView.getMapView().getMapPanel().getLayout();
+                    if (playerB.getPokemons().size() == 2) {
+                        JPanel pokemon2_2 = new ImagePanel(playerB.getPokemons().get(1).getPokemonImage(), height / 12, height / 12);
+                        pokemon2_2.setPreferredSize(new Dimension(height / 12, height / 12));
+                        pokemon2_2.setBackground(new Color(0, 0, 0, 0));
+                        gameView.getMapView().setPokemon2_2(pokemon2_2);
+                        gameView.getMapView().getPokemon2Panel2().add(gameView.getMapView().getPokemon2_2());
+                        gameView.getMapView().revalidate();
+                        gameView.getMapView().repaint();
+                    } else if (playerB.getPokemons().size() == 3) {
+                        JPanel pokemon3_2 = new ImagePanel(playerB.getPokemons().get(2).getPokemonImage(), height / 12, height / 12);
+                        pokemon3_2.setPreferredSize(new Dimension(height / 12, height / 12));
+                        pokemon3_2.setBackground(new Color(0, 0, 0, 0));
+                        gameView.getMapView().setPokemon3_2(pokemon3_2);
+                        gameView.getMapView().getPokemon3Panel2().add(gameView.getMapView().getPokemon3_2());
+                        gameView.getMapView().revalidate();
+                        gameView.getMapView().repaint();
+                    } else {
+                        playerB.removePokemon();
+
+                        gameView.getMapView().getPokemon1Panel2().remove(gameView.getMapView().getPokemon1_2());
+                        JPanel pokemon1_2 = new ImagePanel(playerB.getPokemons().get(0).getPokemonImage(), height / 12, height / 12);
+                        pokemon1_2.setPreferredSize(new Dimension(height / 12, height / 12));
+                        pokemon1_2.setBackground(new Color(0, 0, 0, 0));
+                        gameView.getMapView().setPokemon1_2(pokemon1_2);
+                        gameView.getMapView().getPokemon1Panel2().add(pokemon1_2);
+
+                        gameView.getMapView().getPokemon2Panel2().remove(gameView.getMapView().getPokemon2_2());
+                        JPanel pokemon2_2 = new ImagePanel(playerB.getPokemons().get(1).getPokemonImage(), height / 12, height / 12);
+                        pokemon2_2.setPreferredSize(new Dimension(height / 12, height / 12));
+                        pokemon2_2.setBackground(new Color(0, 0, 0, 0));
+                        gameView.getMapView().setPokemon2_2(pokemon2_2);
+                        gameView.getMapView().getPokemon2Panel2().add(pokemon2_2);
+
+                        gameView.getMapView().getPokemon3Panel2().remove(gameView.getMapView().getPokemon3_2());
+                        JPanel pokemon3_2 = new ImagePanel(playerB.getPokemons().get(2).getPokemonImage(), height / 12, height / 12);
+                        pokemon3_2.setPreferredSize(new Dimension(height / 12, height / 12));
+                        pokemon3_2.setBackground(new Color(0, 0, 0, 0));
+                        gameView.getMapView().setPokemon3_2(pokemon3_2);
+                        gameView.getMapView().getPokemon3Panel2().add(pokemon3_2);
+
+                        gameView.getMapView().getVariousMenuPanel().revalidate();
+                        gameView.getMapView().getVariousMenuPanel().repaint();
+                    }
+                    System.out.println("Now b have pokemon " + playerB.getPokemons().size());
                     gameView.getMapView().getMapPanel().remove(layout.getLayoutComponent(BorderLayout.CENTER));
                     pokemonFightview = new EventView(-1,
                             false,
                             true,
                             false,
                             playerB,
+                            playerA,
                             false,
                             width,
                             height);
+                    try{
+                        Thread.sleep(5);
+                        saveThread.get(0).interrupt();
+                        saveThread.remove(0);
+                    }catch(Exception e){
+                        Thread.currentThread().interrupt(); // propagate interrupt
+                    }
                     gameView.getMapView().getMapPanel().add(pokemonFightview, BorderLayout.CENTER);
                     gameView.getMapView().getMapPanel().revalidate();
                     gameView.getMapView().getMapPanel().repaint();
 
                 }
-                try {
+                try{
                     saveThread.get(0).interrupt();
                     saveThread.remove(0);
-                } catch (Exception i) {
-                    i.printStackTrace();
+                }catch(Exception e){
+                    Thread.currentThread().interrupt(); // propagate interrupt
                 }
+            }
+            try{
+                saveThread.get(0).interrupt();
+                saveThread.remove(0);
+            }catch(Exception e){
+                Thread.currentThread().interrupt(); // propagate interrupt
             }
 
         }
-        if(enmemypokemon.getHP() < 0 ){
+        if(enmemypokemon.getHP() <= 0 && boolviewcatch == false){
             System.out.println("DIED");
-            BorderLayout layout = (BorderLayout) gameView.getMapView().getMapPanel().getLayout();
             gameView.getMapView().getMapPanel().remove(layout.getLayoutComponent(BorderLayout.CENTER));
             if(isPlayer1 == false){
                 //เพิ่ม HP Pokemon ของ Player A
+                for(int i = 0; i<playerA.getPokemons().size(); i++) {
+                    playerA.getPokemon(i).setHP(60);
+                    playerA.getPokemon(i).setATK(60);
+
+                }
 
                 // สร้างหน้าที่บอกว่าโปเกม่อนตาย
                 pokemonFightview = new EventView(-3,
                         false,
-                        true,
+                        false,
                         false,
                         playerA,
-                        true,
-                        width,
-                        height);
-                gameView.getMapView().getMapPanel().add(pokemonFightview, BorderLayout.CENTER);
-                gameView.getMapView().getMapPanel().revalidate();
-                gameView.getMapView().getMapPanel().repaint();
-                try {
-                    saveThread.get(0).interrupt();
-                    saveThread.remove(0);
-                } catch (Exception i) {
-                    i.printStackTrace();
-                }
-
-
-            }
-            else if(isPlayer1 == true){
-                // เพิ่ม HP pokomon ของ Player B
-                System.out.println("player + kill enemy");
-                pokemonFightview = new EventView(-3,
-                        false,
-                        true,
-                        false,
                         playerB,
                         true,
                         width,
@@ -777,9 +958,64 @@ public class GameController implements MouseListener, Runnable {
                 } catch (Exception i) {
                     i.printStackTrace();
                 }
-
+                state = true;
             }
+            else if(isPlayer1 == true){
+                // เพิ่ม HP pokomon ของ Player B
+                for(int i = 0; i<playerA.getPokemons().size(); i++) {
+                    playerB.getPokemon(i).setHP(60);
+                    playerB.getPokemon(i).setATK(60);
+                }
+                System.out.println("player + kill enemy");
+                pokemonFightview = new EventView(-3,
+                        false,
+                        false,
+                        false,
+                        playerB,
+                        playerA,
+                        true,
+                        width,
+                        height);
+                gameView.getMapView().getMapPanel().add(pokemonFightview, BorderLayout.CENTER);
+                gameView.getMapView().getMapPanel().revalidate();
+                gameView.getMapView().getMapPanel().repaint();
+
+                try {
+                    saveThread.get(0).interrupt();
+                    saveThread.remove(0);
+                } catch (Exception i) {
+                    i.printStackTrace();
+                }
+                state = true;
+            }
+
         }
+
+        if(CountRound  >= 2 && playerFight == true){
+
+            gameView.getMapView().getMapPanel().remove(layout.getLayoutComponent(BorderLayout.CENTER));
+            pokemonFightview = new EventView(-200,
+                    true,
+                    false,
+                    false,
+                    playerB,
+                    playerA,
+                    true,
+                    width,
+                    height);
+            gameView.getMapView().getMapPanel().add(pokemonFightview, BorderLayout.CENTER);
+            gameView.getMapView().getMapPanel().revalidate();
+            gameView.getMapView().getMapPanel().repaint();
+            try{
+                saveThread.get(0).interrupt();
+                saveThread.remove(0);
+            }catch(Exception e){
+                Thread.currentThread().interrupt(); // propagate interrupt
+            }
+
+        }
+        state = true;
+
     }
     // JoptionPlane =======================================================================
     public  void GetJoptionPlane(){

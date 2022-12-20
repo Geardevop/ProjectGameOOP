@@ -8,7 +8,7 @@ public class GameView extends JFrame implements Runnable{
     private int width, height;
     private Icon playerIcon1, playerIcon2;// <-------------------------------------------------- Change This -------------------------------------------------->
 
-    public GameView(int width, int height){
+    public GameView(int width, int height, Player playerA, Player playerB){
         this.width = width;
         this.height = height;
 
@@ -26,7 +26,7 @@ public class GameView extends JFrame implements Runnable{
 
         menuView = new MainMenuView(width, height);
 
-        mapView = new MainMapView(width, height);
+        mapView = new MainMapView(width, height, playerA, playerB);
 
         Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
 

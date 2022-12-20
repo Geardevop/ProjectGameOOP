@@ -8,18 +8,19 @@ public class Pokemon {
     private int HP;
     private int ATK;
 
-    private Image pokemonpic;
+    private Image pokemonpic, pokemonImage;
 
     public Pokemon() {
-        this("", "", 0, 0, null);
+        this("", "", 0, 0, null, null);
     }
 
-    public Pokemon(String name, String type, int HP, int ATK, Image pokomonpic) {
+    public Pokemon(String name, String type, int HP, int ATK, Image pokomonpic, Image pokemonImage) {
         this.pokemonpic = pokomonpic;
         this.name = name;
         this.type = type;
         this.HP = HP;
         this.ATK = ATK;
+        this.pokemonImage = pokemonImage;
     }
 
     public void attack(Pokemon p) {
@@ -87,6 +88,10 @@ public class Pokemon {
 
     public void setATK(int ATK) {
         this.ATK += ATK;
+    }
+
+    public Image getPokemonImage() {
+        return pokemonImage;
     }
 
 

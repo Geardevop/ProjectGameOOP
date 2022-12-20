@@ -15,15 +15,14 @@ public class MainMapView extends JPanel{
     private JLabel pokemon1Name, pokemon2Name, pokemon3Name, pokemon1Image, pokemon2Image, pokemon3Image;
     private Border blackline;
     private JTextField HPTextField, maxHPTextField;
+    private JPanel pokemon1_1, pokemon2_1, pokemon3_1, pokemon1_2, pokemon2_2, pokemon3_2;
 
     /// Gear
     private EventView eventView;
 
-    public MainMapView(int width, int height){
+    public MainMapView(int width, int height, Player playerA, Player playerB){
         // Event view
-        eventView =  new EventView(-2, false, false, true, null, false,width,height );
-
-
+        eventView =  new EventView(-2, false, false, true, null, null,false,width,height );
         //<--------------------------------------------End Event View---------------------------------------------------->
         //<------------------------------------------------Create JSwing------------------------------------------------>
         //<-------------Images------------->
@@ -258,7 +257,25 @@ public class MainMapView extends JPanel{
         mapPanel.add(westPanel, BorderLayout.WEST);
         mapPanel.add(eventView, BorderLayout.CENTER);
 
-        //<-------------PokemonPanel------------->
+        //<-------------PokemonPanel1------------->
+        pokemon1Panel1.setLayout(new FlowLayout());
+        pokemon1_1 = new ImagePanel(playerA.getPokemons().get(0).getPokemonImage(), height/12, height/12);
+        pokemon1_1.setPreferredSize(new Dimension(height/12, height/12));
+        pokemon1_1.setBackground(new Color(0,0,0,0));
+        pokemon1Panel1.add(pokemon1_1);
+        pokemon2Panel1.setLayout(new FlowLayout());
+        pokemon3Panel1.setLayout(new FlowLayout());
+
+        //<-------------PokemonPanel2------------->
+        pokemon1Panel2.setLayout(new FlowLayout());
+        pokemon1_2 = new ImagePanel(playerB.getPokemons().get(0).getPokemonImage(), height/12, height/12);
+        pokemon1_2.setPreferredSize(new Dimension(height/12, height/12));
+        pokemon1_2.setBackground(new Color(0,0,0,0));
+        pokemon1Panel2.add(pokemon1_2);
+        pokemon2Panel2.setLayout(new FlowLayout());
+        pokemon3Panel2.setLayout(new FlowLayout());
+
+        //<-------------AllPokemonPanel------------->
         pokemonPanel1.setLayout(new FlowLayout());
         pokemonPanel1.setBackground(new Color(18,18,18,0));
         pokemonPanel1.add(Box.createRigidArea(new Dimension(height/12, height/30)));
@@ -351,6 +368,10 @@ public class MainMapView extends JPanel{
         this.add(variousMenuPanel, BorderLayout.EAST);
 
         this.setBounds(0, 0, width, height);
+    }
+
+    public void paintComponent(Graphics g){
+
     }
 
     public JPanel getNorthPanel1() {
@@ -644,5 +665,54 @@ public class MainMapView extends JPanel{
     public void setEventView(EventView eventView) {
         this.eventView = eventView;
     }
+
+    public void setPokemon1_1(JPanel pokemon1_1) {
+        this.pokemon1_1 = pokemon1_1;
+    }
+
+    public void setPokemon2_1(JPanel pokemon2_1) {
+        this.pokemon2_1 = pokemon2_1;
+    }
+
+    public void setPokemon3_1(JPanel pokemon3_1) {
+        this.pokemon3_1 = pokemon3_1;
+    }
+
+    public void setPokemon1_2(JPanel pokemon1_2) {
+        this.pokemon1_2 = pokemon1_2;
+    }
+
+    public void setPokemon2_2(JPanel pokemon2_2) {
+        this.pokemon2_2 = pokemon2_2;
+    }
+
+    public void setPokemon3_2(JPanel pokemon3_2) {
+        this.pokemon3_2 = pokemon3_2;
+    }
+
+    public JPanel getPokemon1_1() {
+        return pokemon1_1;
+    }
+
+    public JPanel getPokemon2_1() {
+        return pokemon2_1;
+    }
+
+    public JPanel getPokemon3_1() {
+        return pokemon3_1;
+    }
+
+    public JPanel getPokemon1_2() {
+        return pokemon1_2;
+    }
+
+    public JPanel getPokemon2_2() {
+        return pokemon2_2;
+    }
+
+    public JPanel getPokemon3_2() {
+        return pokemon3_2;
+    }
+
 }
 
